@@ -6,33 +6,24 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgproc.hpp>
+#include <QObject>
+#include <QImage>
 
-
-#include <QWidget>
-
-class HandlerRTSP : public QWidget
+class HandlerRTSP : public QObject
 {
     Q_OBJECT
 public:
-    explicit HandlerRTSP(const std::string& rtsp, QWidget *parent = nullptr);
+    explicit HandlerRTSP(const std::string& rtsp, QObject *parent = nullptr);
     ~HandlerRTSP();
 public slots:
-    void play();
     void playVideoFrame();
     void setRTSP(const std::string& rtsp);
     void setPlayerWindow(QWidget* playerWindow);
-
-
 private:
     std::string rtsp_;
     QImage mat2Image(const cv::Mat& src);
     QWidget* playerWindow_;
     void delay(int n);
-
-
-
-
-
 signals:
     void sendFrame(const QImage&);
 };

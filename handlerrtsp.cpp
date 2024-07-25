@@ -7,7 +7,7 @@
 #include <QTimer>
 
 
-HandlerRTSP::HandlerRTSP(const std::string &rtsp, QWidget *parent) : QWidget(parent),
+HandlerRTSP::HandlerRTSP(const std::string &rtsp, QObject *parent) : QObject(parent),
     rtsp_(rtsp)
 {
 
@@ -28,51 +28,10 @@ void HandlerRTSP::setPlayerWindow(QWidget *playerWindow)
     playerWindow_= playerWindow;
 }
 
-void HandlerRTSP::play()
-{
-    cv::VideoCapture capture;
-    capture.open(rtsp_);
-    if (!capture.isOpened()) {
-        qDebug() << "Ошибка: не удалось открыть RTSP поток";
-        return;
-    }
-    cv::Mat frame;
-    while (true) {
-        // Чтение следующего кадра
-        capture.read(frame);
-        // Проверка на окончание кадров
-        QImage img = mat2Image(frame);
-        QRegion reg(img.rect());
-        QPaintEvent event(reg);
-        emit sendFrame(img);
-        QCoreApplication::sendEvent(playerWindow_, &event);
-
-        if (frame.empty())
-        {
-            capture.open(rtsp_);
-            qDebug() << "Restart video";
-            capture.read(frame);
-            if(frame.empty())
-            {
-                qDebug() << "Reset is not successful";
-                break;
-            }
-
-        }
-        // Отображение кадра
-        cv::imshow("RTSP Stream_1", frame);
-        // Ожидание 30 мс или прерывание при нажатии клавиши
-        if (cv::waitKey(30) >= 0) break;
-    }
-    // Освобождение ресурсов
-    capture.release();
-    cv::destroyAllWindows();
-
-}
 
 void HandlerRTSP::playVideoFrame()
 {
-    qDebug() << "void HandlerRTSP::playVideoFrame()";
+    //qDebug() << "void HandlerRTSP::playVideoFrame()";
     cv::VideoCapture capture;
     capture.open(rtsp_);
     if (!capture.isOpened()) {
@@ -85,10 +44,8 @@ void HandlerRTSP::playVideoFrame()
         capture.read(frame);
         // Проверка на окончание кадров
         QImage img = mat2Image(frame);
-        QRegion reg(img.rect());
-        QPaintEvent event(reg);
         emit sendFrame(img);
-        qDebug() << "generate emit";
+        //qDebug() << "generate emit";
         if (frame.empty())
         {
             capture.open(rtsp_);
@@ -101,7 +58,6 @@ void HandlerRTSP::playVideoFrame()
             }
 
         }
-        //QThread::msleep(30);
         // Отображение кадра
         //cv::imshow("RTSP Stream_1", frame);
         // Ожидание 30 мс или прерывание при нажатии клавиши

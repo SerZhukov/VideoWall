@@ -1,11 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include "handlerrtsp.h"
-#include "mainwindow.h"
-#include "videoplayer.h"
 #include <iostream>
-
 #include <QWidget>
+#include <QThread>
+#include "handlerrtsp.h"
+#include "videoplayer.h"
 
 class Player : public QWidget
 {
@@ -13,13 +12,13 @@ class Player : public QWidget
 public:
     explicit Player(QWidget *parent = nullptr);
     void setRTSP(const std::string& rtsp);
-    void play();
     void play_alt();
+    void play_no_thread();
 private:
-    HandlerRTSP* handler;
-    MainWindow* playerWindow;
-    VideoPlayer* screen;
+    HandlerRTSP* handler_;
+    VideoPlayer* screen_;
     std::string rtsp_;
+    QThread* thread_;
 };
 
 #endif // PLAYER_H

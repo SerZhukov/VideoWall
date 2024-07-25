@@ -15,6 +15,7 @@ class VideoPlayer : public QWidget
     Q_OBJECT
 public:
     explicit VideoPlayer(QWidget *parent = nullptr);
+    ~ VideoPlayer();
 public slots:
     void setFrame(const QImage frame);
 private:

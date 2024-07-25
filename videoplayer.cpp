@@ -14,16 +14,21 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 
 }
 
+VideoPlayer::~VideoPlayer()
+{
+    qDebug() << "VideoPlayer::~VideoPlayer()";
+}
+
 void VideoPlayer::setFrame(const QImage frame)
 {
-    qDebug() << "void VideoPlayer::setFrame(const QImage frame)";
+    //qDebug() << "void VideoPlayer::setFrame(const QImage frame)";
     if(!frame_.convertFromImage(frame))
     {
-        qDebug() << "Error convert QImage to QPixmap";
+        //qDebug() << "Error convert QImage to QPixmap";
     }
     else
     {
         scene->addPixmap(frame_);
-        qDebug() << "setFrame correct";
+        //qDebug() << "setFrame correct";
     }
 }

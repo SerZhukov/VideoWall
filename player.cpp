@@ -3,13 +3,13 @@
 Player::Player(QWidget *parent)
     : QWidget{parent}
 {
-    handler = new HandlerRTSP(rtsp_, this);
-    playerWindow = new MainWindow(this);
-    screen = new VideoPlayer;
-    screen->show();
-    handler->setPlayerWindow(playerWindow);
-    QObject::connect(handler, &HandlerRTSP::sendFrame, playerWindow, &MainWindow::setFrame);
-    QObject::connect(handler, &HandlerRTSP::sendFrame, screen, &VideoPlayer::setFrame);
+    //thread_= new QThread(this);
+    handler_ = new HandlerRTSP(rtsp_, this);
+    screen_ = new VideoPlayer;
+    screen_->show();
+    connect(handler_, &HandlerRTSP::sendFrame, screen_, &VideoPlayer::setFrame);
+    //connect(thread_, &QThread::started, handler_, &HandlerRTSP::playVideoFrame);
+
 
 }
 
@@ -18,18 +18,17 @@ void Player::setRTSP(const std::string &rtsp)
     rtsp_ = rtsp;
 }
 
-void Player::play()
-{
-    handler->setRTSP(rtsp_);
-    playerWindow->show();
-    handler->play();
-}
 
 void Player::play_alt()
 {
-    qDebug() << "void Player::play_alt()";
-    handler->setRTSP(rtsp_);
+    //qDebug() << "void Player::play_alt()";
+    handler_->setRTSP(rtsp_);
+    //handler_->playVideoFrame();
+    thread_->start();
+}
 
-    handler->playVideoFrame();
-
+void Player::play_no_thread()
+{
+    handler_->setRTSP(rtsp_);
+    handler_->playVideoFrame();
 }

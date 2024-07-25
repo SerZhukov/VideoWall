@@ -15,13 +15,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     handlerrtsp.cpp \
     main.cpp \
-    mainwindow.cpp \
     player.cpp \
     videoplayer.cpp
 
 HEADERS += \
     handlerrtsp.h \
-    mainwindow.h \
     player.h \
     videoplayer.h
 
