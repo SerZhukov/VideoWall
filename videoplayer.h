@@ -20,12 +20,10 @@ public slots:
     void setFrame(const QImage frame);
 private:
     QPixmap frame_;
-    QGraphicsScene* scene;
-    QGraphicsView* view;
-    QGraphicsPixmapItem* item;
-    QVBoxLayout* layout;
-
-
+    QGraphicsScene* scene_;
+    QGraphicsView* view_;
+    QGraphicsPixmapItem* item_;
+    QVBoxLayout* layout_;
 signals:
 
 };

@@ -23,10 +23,10 @@ void HandlerRTSP::setRTSP(const std::string& rtsp)
     rtsp_=rtsp;
 }
 
-void HandlerRTSP::setPlayerWindow(QWidget *playerWindow)
-{
-    playerWindow_= playerWindow;
-}
+//void HandlerRTSP::setPlayerWindow(QWidget *playerWindow)
+//{
+//    playerWindow_= playerWindow;
+//}
 
 
 void HandlerRTSP::playVideoFrame()

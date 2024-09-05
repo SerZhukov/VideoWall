@@ -15,13 +15,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     handlerrtsp.cpp \
     main.cpp \
+    mainwindow.cpp \
     player.cpp \
-    videoplayer.cpp
+    rtspinputdisplay.cpp \
+    screen.cpp \
+    screenaddsettings.cpp \
+    screenpartitionbuttons.cpp \
+    videoplayer.cpp \
+    worksreens.cpp
 
 HEADERS += \
     handlerrtsp.h \
+    mainwindow.h \
     player.h \
-    videoplayer.h
+    rtspinputdisplay.h \
+    screen.h \
+    screenaddsettings.h \
+    screenpartitionbuttons.h \
+    videoplayer.h \
+    worksreens.h
 
 INCLUDEPATH += C:\OpenCV\opencv\release\install\include
 
@@ -39,3 +51,9 @@ LIBS += C:\OpenCV\opencv\release\bin\libopencv_video4100.dll
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    ../../../../../Users/Sergey Zhukov/Desktop/icon/icon_screens.jpg
+
+RESOURCES += \
+    resource.qrc

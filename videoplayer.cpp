@@ -4,31 +4,29 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     : QWidget{parent}
 {
 
-    item = new QGraphicsPixmapItem;
-    scene = new QGraphicsScene(QRectF(0, 0, 500, 500), this);
-    view = new QGraphicsView(scene, this);
-    layout = new QVBoxLayout(this);
-    layout->addWidget(view);
-    view->show();
-    qDebug() << "VideoPlayer::VideoPlayer(QWidget *parent)";
-
+    item_ = new QGraphicsPixmapItem;
+    scene_ = new QGraphicsScene(QRectF(0, 0, 500, 500), this);
+    view_ = new QGraphicsView(scene_, this);
+    layout_ = new QVBoxLayout(this);
+    layout_->addWidget(view_);
+    view_->show();
 }
 
 VideoPlayer::~VideoPlayer()
 {
-    qDebug() << "VideoPlayer::~VideoPlayer()";
+
 }
 
 void VideoPlayer::setFrame(const QImage frame)
 {
-    //qDebug() << "void VideoPlayer::setFrame(const QImage frame)";
+
     if(!frame_.convertFromImage(frame))
     {
         //qDebug() << "Error convert QImage to QPixmap";
     }
     else
     {
-        scene->addPixmap(frame_);
-        //qDebug() << "setFrame correct";
+        scene_->clear();
+        scene_->addPixmap(frame_);
     }
 }

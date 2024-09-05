@@ -18,7 +18,7 @@ public:
 public slots:
     void playVideoFrame();
     void setRTSP(const std::string& rtsp);
-    void setPlayerWindow(QWidget* playerWindow);
+    //void setPlayerWindow(QWidget* playerWindow);
 private:
     std::string rtsp_;
     QImage mat2Image(const cv::Mat& src);
