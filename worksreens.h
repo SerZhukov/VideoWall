@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include <QGridLayout>
+#include <QHBoxLayout>
+#include "cameralistwidget.h"
+#include <QTextEdit>
 
 class WorkSreens : public QWidget
 {
@@ -11,8 +14,11 @@ public:
     explicit WorkSreens(QWidget *parent = nullptr);
 public slots:
     void generateScr(int countScr);
+    void toggleCameraListWidget();
 private:
     QGridLayout* grdLayout_;
+    QHBoxLayout* mainLayout_;
+    CameraListWidget* cameraListWidget_;
 
 
 signals:

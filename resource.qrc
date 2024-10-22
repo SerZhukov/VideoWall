@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>resources/icon_add.jpg</file>
         <file>resources/icon_screens.jpg</file>
+        <file>resources/icon_cam.jpg</file>
     </qresource>
 </RCC>
