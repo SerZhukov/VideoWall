@@ -1,3 +1,4 @@
+//класс для отображения кадра, получает кадр от handlerrtsp.h
 #ifndef VIDEOPLAYER_H
 #define VIDEOPLAYER_H
 
@@ -8,7 +9,6 @@
 #include <QGraphicsPixmapItem>
 #include <QPixmap>
 #include <QVBoxLayout>
-
 
 class VideoPlayer : public QWidget
 {
@@ -22,10 +22,7 @@ private:
     QPixmap frame_;
     QGraphicsScene* scene_;
     QGraphicsView* view_;
-    QGraphicsPixmapItem* item_;
     QVBoxLayout* layout_;
-signals:
-
 };
 
 #endif // VIDEOPLAYER_H

@@ -1,3 +1,5 @@
+//класс для обработки rtsp ссылок(используя библиотеку OpenCV) и отправки кадра
+
 #ifndef HANDLERRTSP_H
 #define HANDLERRTSP_H
 #include <iostream>
@@ -18,11 +20,9 @@ public:
 public slots:
     void playVideoFrame();
     void setRTSP(const std::string& rtsp);
-    //void setPlayerWindow(QWidget* playerWindow);
 private:
     std::string rtsp_;
     QImage mat2Image(const cv::Mat& src);
-    QWidget* playerWindow_;
     void delay(int n);
 signals:
     void sendFrame(const QImage&);

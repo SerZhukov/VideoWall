@@ -13,6 +13,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    cameralistwidget.cpp \
     handlerrtsp.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -21,10 +22,14 @@ SOURCES += \
     screen.cpp \
     screenaddsettings.cpp \
     screenpartitionbuttons.cpp \
+    settings.cpp \
+    settingsmanagertest.cpp \
+    streamconfig.cpp \
     videoplayer.cpp \
     worksreens.cpp
 
 HEADERS += \
+    cameralistwidget.h \
     handlerrtsp.h \
     mainwindow.h \
     player.h \
@@ -32,6 +37,9 @@ HEADERS += \
     screen.h \
     screenaddsettings.h \
     screenpartitionbuttons.h \
+    settings.h \
+    settingsmanagertest.h \
+    streamconfig.h \
     videoplayer.h \
     worksreens.h
 

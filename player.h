@@ -1,3 +1,4 @@
+//Класс для запуска обработчика rtsp ccылок и передачи на кадра на videoplayer.h
 #ifndef PLAYER_H
 #define PLAYER_H
 #include <iostream>
@@ -12,7 +13,7 @@ class Player : public QWidget
 public:
     explicit Player(QWidget *parent = nullptr);
     void setRTSP(const std::string& rtsp);
-    void play_alt();
+    void play();
     void play_no_thread();
 private:
     HandlerRTSP* handler_;
