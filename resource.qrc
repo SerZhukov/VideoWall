@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/icon_add.jpg</file>
+        <file>resources/icon_screens.jpg</file>
+        <file>resources/icon_cam.jpg</file>
+        <file>resources/start_cover_cam.jpg</file>
+        <file>resources/icon_full_screen.jpg</file>
+        <file>resources/icon_video_gray.png</file>
+        <file>resources/icon_cover.png</file>
+        <file>resources/icon_video_green.png</file>
+    </qresource>
+</RCC>
