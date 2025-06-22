@@ -5,12 +5,16 @@
 #include <QDragEnterEvent>
 #include <QMimeData>
 #include <QDropEvent>
+#include "streamcontext.h"
+#include <gst/gst.h>
+#include <gst/video/video.h>
+#include <glib.h>
 
 class GraphicsView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    GraphicsView(QGraphicsScene *scene, QWidget *parent = nullptr);
+    GraphicsView(StreamContext* streamContext, QGraphicsScene *scene, QWidget *parent = nullptr);
     GraphicsView(QWidget *parent = nullptr);
     ~GraphicsView();
 protected:
@@ -19,10 +23,12 @@ protected:
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
 private:
+        StreamContext* m_streamContex;
         QString m_rtspLink;
         QString m_textOverlay;
         QString m_pathCover;
         void clearDropInfo();
+        void updateRenderRect();
 signals:
     void rtspLinkDropped(const QString& rtspLink);
     void coverPathDropped(const QString& coverPath);

@@ -1,14 +1,20 @@
 #include "videoplayer.h"
 
-VideoPlayer::VideoPlayer(QWidget *parent)
-    : QWidget{parent}
+VideoPlayer::VideoPlayer(StreamContext* streamContext, QWidget *parent)
+    : QWidget{parent}, m_streamContex{streamContext}
 {
     m_scene = new QGraphicsScene;
-    m_view = new GraphicsView(m_scene);
+    m_view = new GraphicsView(m_streamContex, m_scene);
+
+    setAcceptDrops(true);
     m_view->setLineWidth(1);
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
+    m_loadingWidget = new LoadingWidget;
+    m_stackedLayout = new QStackedLayout;
+    m_stackedLayout->addWidget(m_view);
+    m_stackedLayout->addWidget(m_loadingWidget);
     m_layout = new QVBoxLayout;
-    m_layout->addWidget(m_view);
+    m_layout->addLayout(m_stackedLayout);
     m_layout->setContentsMargins(0,0,0,0);
     setLayout(m_layout);
     QPixmap frame("://resources//start_cover_cam");
@@ -28,6 +34,12 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     connect(m_view, &GraphicsView::coverPathDropped, this, &VideoPlayer::setCover);
     //received the signal about clearnig screen(stop rtsp stream) in GraphicsView
     connect(m_view, &GraphicsView::clearScreen, this, &VideoPlayer::emitClearScreen);
+    //received the signal obout interrupting loading. Stoped rtsp stream and changed screen.
+    connect(m_loadingWidget, &LoadingWidget::interruptLoad, this, [this]()
+            {
+        emit clearScreen();
+        setVideoScreen();
+    });
 }
 
 VideoPlayer::~VideoPlayer()
@@ -56,6 +68,7 @@ void VideoPlayer::emitStartRtspStream()
     }
     emit startRtspStream();
     m_setRtspStream = true;
+    setLoadScreen();
 }
 
 void VideoPlayer::emitClearScreen()
@@ -85,8 +98,8 @@ void VideoPlayer::setCover(const QString &coverPath)
     deleteCover();
     QPixmap cover(coverPath);
     m_cover = new QGraphicsPixmapItem(cover);
-    m_scene ->addItem(m_cover);
     m_scene->setSceneRect(cover.rect());
+    m_scene ->addItem(m_cover);  
     m_view->fitInView(m_cover, Qt::IgnoreAspectRatio);
     m_view->centerOn(m_cover);
     m_setCover = true;
@@ -109,6 +122,24 @@ WId VideoPlayer::getWId()
 {
     return m_view->winId();
 }
+
+void VideoPlayer::setVideoScreen()
+{
+    m_stackedLayout->setCurrentIndex(VIDEO_SCREEN);
+}
+
+void VideoPlayer::setLoadScreen()
+{
+    m_stackedLayout->setCurrentIndex(LOAD_SCREEN);
+    m_loadingWidget->startAnimation();
+}
+
+void VideoPlayer::test()
+{
+    qDebug() << "void VideoPlayer::test()";
+}
+
+
 
 
 

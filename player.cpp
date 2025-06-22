@@ -5,8 +5,9 @@ Player::Player(QWidget *parent)
     : QWidget{parent}
 {
     qDebug() << "Player::Player(QWidget *parent)";
-    m_handlerGSt = new HandlerGStreamer;
-    m_screen = new VideoPlayer(this);
+    m_streamContex = new StreamContext(this);
+    m_handlerGSt = new HandlerGStreamer(m_streamContex);
+    m_screen = new VideoPlayer(m_streamContex, this);
     m_screen->setContentsMargins(0,0,0,0);
     //Set Qt window ID for GStreamer to render video into
     m_handlerGSt->setWinId(m_screen->getWId());
@@ -27,11 +28,13 @@ Player::Player(QWidget *parent)
     });
     // Stop the stream and clear the screen when the "Delete" key is pressed
     connect(m_screen, &VideoPlayer::clearScreen, m_handlerGSt, &HandlerGStreamer::stopVideo);
-
+    //Set VideoScreen after LoadScreen
+    connect(m_handlerGSt, &HandlerGStreamer::startRtspStream, m_screen, &VideoPlayer::setVideoScreen);
 }
 
 Player::~Player()
 {
+    qDebug() << "Player::~Player()";
     if(m_handlerGSt->isRunning())
     {
         m_handlerGSt->stopVideo();

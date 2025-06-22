@@ -23,9 +23,11 @@ private:
     SignalTransmitter* m_transmitterChangeSettings;
     SettingsManager* m_settingsManager;
     QMap<QString, StreamGroupData> m_data;
+    void clearCameraList();
 public slots:
     void setData(const QMap<QString, StreamGroupData>& data);
-    void clearData();
+
+
 };
 
 #endif // CAMERALISTWIDGET_H

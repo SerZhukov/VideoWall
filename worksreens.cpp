@@ -8,16 +8,18 @@ WorkSreens::WorkSreens(QWidget *parent)
 {
     m_mainLayout = new QHBoxLayout;
     m_mainLayout->setSpacing(0);
+    m_mainLayout->setContentsMargins(0, 0, 0, 0);
     //компоновка для размещения изображений с камер
     m_grdLayout = new QGridLayout;
     m_grdLayout->setContentsMargins(0,0,0,0);
-    m_grdLayout->setSpacing(0);
+    m_grdLayout->setSpacing(2);
     m_mainLayout->addLayout(m_grdLayout);
     //класс для размещения списка объектов с камерами
     m_cameraListWidget = new CameraListWidget;
     m_mainLayout->addWidget(m_cameraListWidget);
     setLayout(m_mainLayout);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    setContentsMargins(0, 0, 0, 0);
 }
 
 void WorkSreens::generateScr(int countScr)

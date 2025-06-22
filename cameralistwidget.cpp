@@ -22,6 +22,12 @@ CameraListWidget::CameraListWidget(QWidget *parent)
     m_mainLayout->addWidget(m_view);
     setLayout(m_mainLayout);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    //очистка данных
+    m_view->addAction("Удалить", this, [this]() {
+        clearCameraList();
+        m_settingsManager->clearData();
+    });
+    m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
     //объект одиночка передающий сигнал при изменении настроек
     m_transmitterChangeSettings = SingletonTransmitter::instance();
     //object for load the settings
@@ -39,7 +45,7 @@ CameraListWidget::CameraListWidget(QWidget *parent)
 
 void CameraListWidget::setData(const QMap<QString, StreamGroupData> &data)
 {
-    clearData();
+    clearCameraList();
     for(auto it = data.cbegin();it != data.end(); ++it)
     {        
         QStandardItem* object = new QStandardItem(it.key());
@@ -73,7 +79,8 @@ void CameraListWidget::setData(const QMap<QString, StreamGroupData> &data)
     }
 }
 
-void CameraListWidget::clearData()
+void CameraListWidget::clearCameraList()
 {
     m_model->removeRows(0, m_model->rowCount());
+
 }

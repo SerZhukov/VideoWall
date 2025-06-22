@@ -72,6 +72,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         constants.h
         esckeyfilter.h esckeyfilter.cpp
         resource.qrc
+        loadingwidget.h loadingwidget.cpp
+        streamcontext.h streamcontext.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

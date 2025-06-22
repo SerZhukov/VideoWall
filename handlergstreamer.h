@@ -10,15 +10,18 @@
 #include "GStreamerData.h"
 #include "ibuscallback.h"
 #include "igstreamerdataprovider.h"
+#include "streamcontext.h"
 
 
 class HandlerGStreamer : public QThread, public IGStreamerDataProvider, public IBusCallback
 {
     Q_OBJECT
 public:
-    explicit HandlerGStreamer(QObject *parent = nullptr);
+    explicit HandlerGStreamer(StreamContext* streamContext, QObject *parent = nullptr);
     void stopLoop() override;
     const VideoData& getData() override;
+    void emitStartRtspStream();
+    void emitSendLoadInfo(const QString& str);
     ~HandlerGStreamer();
 
 public slots:
@@ -33,10 +36,11 @@ public slots:
 protected:
     void run() override;
 private:
+    StreamContext* m_streamContext;
     QString m_rtspLink;
     QString m_overlayText;
-    VideoData videoData;
-    AudioData audioData;
+    VideoData m_videoData;
+    AudioData m_audioData;
     WId m_wid;
     guint bus_watch_id;
     //This variable is necessary to run the main loop
@@ -46,8 +50,15 @@ private:
     static void pad_added_audio(GstElement* src, GstPad* new_pad, AudioData* data);
     //Start main pipeline
     void startPipeline();
+    //create Gst elements
+    void createGstElements();
+
 signals:
     void videoStopped();
+    void startRtspStream();
+    void stopRtspStreap();
+    void pauseRtspStream();
+    void sendLoadInfo(const QString&);
 
 };
 

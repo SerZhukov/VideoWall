@@ -7,6 +7,7 @@ RtspInputDisplay::RtspInputDisplay(QWidget* parent) : QDialog(parent)
     m_confirmAddRtsp = new QPushButton("Добавить RTSP");
     m_cancelAddRtsp = new QPushButton("Отмена");
     m_confirmCancelLayout = new QHBoxLayout;
+    m_confirmCancelLayout->addStretch(1);
     m_confirmCancelLayout->addWidget(m_confirmAddRtsp);
     m_confirmCancelLayout->addWidget(m_cancelAddRtsp);
     m_mainLayout->addSpacing(20);
@@ -29,15 +30,20 @@ void RtspInputDisplay::sendRtspSignal()
 void RtspInputDisplay::addSection()
 {
     QVBoxLayout* sectLayout = new QVBoxLayout;
-    QLabel* title = new QLabel("Добавьте RTSP ссылку:");
-    sectLayout->addWidget(title);
-    QLineEdit* inputRtsp = new QLineEdit;
-    sectLayout->addWidget(inputRtsp);
+    QHBoxLayout* sectRtspInput = new QHBoxLayout;
     QLabel* overlayText = new QLabel("Добавьте название камеры:");
-    sectLayout->addWidget(overlayText);
+    sectRtspInput->addWidget(overlayText);
     QLineEdit* inputOverlayText = new QLineEdit;
-    sectLayout->addWidget(inputOverlayText);
+    inputOverlayText->setFixedWidth(100);
+    sectRtspInput->addWidget(inputOverlayText);
+    QLabel* title = new QLabel("Добавьте RTSP ссылку:");
+    sectRtspInput->addWidget(title);
+    QLineEdit* inputRtsp = new QLineEdit;
+    inputRtsp->setFixedWidth(200);
+    sectRtspInput->addWidget(inputRtsp);
+    sectLayout->addLayout(sectRtspInput);
     QHBoxLayout* addNextLayout = new QHBoxLayout;
+    addNextLayout->addStretch(5);
     QPushButton* nextRtsp = new QPushButton("Далее");
     QPushButton* addRtsp = new QPushButton("Добавить");
     QPushButton* deleteRtsp = new QPushButton("Удалить");

@@ -4,7 +4,6 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}, m_workSreens(new WorkSreens(this)), m_scrPartitionBtn(new ScreenPartitionButtons(this))
 {
-    resize(900, 700);
     addToolBar(createToolBar());
     m_workSreens->generateScr(4);
     setCentralWidget(m_workSreens);

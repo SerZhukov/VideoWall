@@ -8,5 +8,7 @@
         <file>resources/icon_video_gray.png</file>
         <file>resources/icon_cover.png</file>
         <file>resources/icon_video_green.png</file>
+        <file>resources/load_animation.gif</file>
+        <file>resources/load_animation_connect.gif</file>
     </qresource>
 </RCC>

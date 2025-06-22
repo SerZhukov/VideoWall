@@ -1,15 +1,18 @@
 #include "graphicsview.h"
 #include "constants.h"
 
-GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget *parent) : QGraphicsView{scene, parent}
+GraphicsView::GraphicsView(StreamContext* streamContext, QGraphicsScene *scene, QWidget *parent)
+    : QGraphicsView{scene, parent}, m_streamContex{streamContext}
 {
+
     setAcceptDrops(true);
     setDragMode(QGraphicsView::NoDrag);
 }
 
 GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView{parent}
 {
-
+    setAcceptDrops(true);
+    setDragMode(QGraphicsView::NoDrag);
 }
 
 GraphicsView::~GraphicsView()
@@ -73,8 +76,9 @@ void GraphicsView::dropEvent(QDropEvent *event)
 
 void GraphicsView::resizeEvent(QResizeEvent *event)
 {
+    fitInView(scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    //updateRenderRect();
     QGraphicsView::resizeEvent(event);
-    fitInView(scene()->itemsBoundingRect(), Qt::IgnoreAspectRatio);
 }
 
 void GraphicsView::keyPressEvent(QKeyEvent *event)
@@ -94,6 +98,22 @@ void GraphicsView::clearDropInfo()
     m_rtspLink.clear();
     m_textOverlay.clear();
     m_pathCover.clear();
+}
+
+void GraphicsView::updateRenderRect()
+{
+    GstElement *sink = m_streamContex->getVideoData().sink;
+    if(!sink)
+    {
+        qDebug() << "Sink is not valid";
+        return;
+    }
+    int w = this->width();
+    qDebug() << "w = " << w;
+    int h = this->height();
+    qDebug() << "h = " << h;
+    gst_video_overlay_set_render_rectangle(GST_VIDEO_OVERLAY(sink), 0, 0, w, h);
+    gst_video_overlay_expose(GST_VIDEO_OVERLAY(sink));
 }
 
 

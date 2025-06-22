@@ -4,19 +4,34 @@
 #include <gst/gst.h>
 
 struct VideoData {
-    GstElement *pipeline;
-    GstElement *source;
-    GstElement *convert;
-    GstElement *textoverlay;
-    GstElement *sink;
+    GstElement *pipeline = nullptr;
+    GstElement *source = nullptr;
+    GstElement *convert = nullptr;
+    GstElement *textoverlay = nullptr;
+    GstElement *sink = nullptr;
+    void clear()
+    {
+        pipeline = nullptr;
+        source = nullptr;
+        convert = nullptr;
+        textoverlay = nullptr;
+        sink = nullptr;
+    }
 };
 
 struct AudioData
 {
-    GstElement *convert;
-    GstElement *resample;
-    GstElement *volume;
-    GstElement *sink;
+    GstElement *convert =  nullptr;
+    GstElement *resample = nullptr;
+    GstElement *volume = nullptr;
+    GstElement *sink = nullptr;
+    void clear()
+    {
+        convert =  nullptr;
+        resample = nullptr;
+        volume = nullptr;
+        sink = nullptr;
+    }
 };
 
 #endif // GSTREAMERDATA_H

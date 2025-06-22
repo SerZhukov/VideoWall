@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "videoplayer.h"
 #include "handlergstreamer.h"
+#include "streamcontext.h"
 #include <QVBoxLayout>
 
 class Player : public QWidget
@@ -17,6 +18,7 @@ public slots:
 private:
     HandlerGStreamer* m_handlerGSt;
     VideoPlayer* m_screen;
+    StreamContext* m_streamContex;
     QVBoxLayout* m_layout;
 };
 
