@@ -41,13 +41,18 @@ private:
     QString m_overlayText;
     VideoData m_videoData;
     AudioData m_audioData;
+    struct MediaData
+    {
+        VideoData video_data;
+        AudioData audio_data;
+    } m_mediaData;
     WId m_wid;
     guint bus_watch_id;
     //This variable is necessary to run the main loop
     GMainLoop* loop;
     // This function will be called by the pad-added signal
     static void pad_added_video(GstElement* src, GstPad* new_pad, VideoData* data);
-    static void pad_added_audio(GstElement* src, GstPad* new_pad, AudioData* data);
+    static void pad_added_audio(GstElement* src, GstPad* new_pad, MediaData* data);
     //Start main pipeline
     void startPipeline();
     //create Gst elements
