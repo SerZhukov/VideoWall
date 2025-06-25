@@ -87,7 +87,7 @@ void HandlerGStreamer::run()
 
 void HandlerGStreamer::pad_added_video(GstElement *src, GstPad *new_pad, VideoData *videoData)
 {
-    GstPad *sink_pad = gst_element_get_static_pad (videoData->queue, "sink");
+    GstPad *sink_pad = gst_element_get_static_pad (videoData->convert, "sink");
     GstPadLinkReturn ret;
     GstCaps *new_pad_caps = nullptr;
     GstStructure *new_pad_struct = nullptr;
@@ -130,22 +130,21 @@ void HandlerGStreamer::pad_added_video(GstElement *src, GstPad *new_pad, VideoDa
     gst_object_unref (sink_pad);
 }
 
-void HandlerGStreamer::pad_added_audio(GstElement *src, GstPad *new_pad, MediaData *mediaData)
+void HandlerGStreamer::pad_added_audio(GstElement *src, GstPad *new_pad, AudioData *audioData)
 {
-    qDebug() << "pad_added_audio";
-
+    GstPad *sink_pad = gst_element_get_static_pad(audioData->convert, "sink");
     GstPadLinkReturn ret;
     GstCaps *new_pad_caps = nullptr;
     GstStructure *new_pad_struct = nullptr;
     const gchar *new_pad_type = nullptr;
     qDebug() << "Received new pad " << GST_PAD_NAME (new_pad) << " from " << GST_ELEMENT_NAME (src);
     // If our converter is already linked, we have nothing to do here
-    // if(gst_pad_is_linked(sink_pad))
-    // {
-    //     qDebug() << "We are already linked. Ignoring.";
-    //     gst_object_unref(sink_pad);
-    //     return;
-    // }
+    if(gst_pad_is_linked(sink_pad))
+    {
+        qDebug() << "We are already linked. Ignoring.";
+        gst_object_unref(sink_pad);
+        return;
+    }
     // Check the new pad's type
     new_pad_caps = gst_pad_get_current_caps (new_pad);
     new_pad_struct = gst_caps_get_structure (new_pad_caps, 0);
@@ -158,25 +157,10 @@ void HandlerGStreamer::pad_added_audio(GstElement *src, GstPad *new_pad, MediaDa
             gst_caps_unref (new_pad_caps);
         }
         // Unreference the sink pad
-        //gst_object_unref (sink_pad);
+        gst_object_unref (sink_pad);
         return;
     }
     // Attempt the link
-
-    gst_bin_add_many (GST_BIN (mediaData->video_data.pipeline), mediaData->audio_data.queue, mediaData->audio_data.convert,
-                     mediaData->audio_data.sink, mediaData->audio_data.resample, mediaData->audio_data.volume, nullptr);
-    if(!gst_element_link_many(mediaData->audio_data.queue, mediaData->audio_data.convert, mediaData->audio_data.resample, mediaData->audio_data.volume, mediaData->audio_data.sink, nullptr))
-    {
-        qDebug() << "Elements audio could not be linked.";
-        //gst_object_unref (m_videoData.pipeline);
-        return;
-    }
-    gst_element_sync_state_with_parent(mediaData->audio_data.queue);
-    gst_element_sync_state_with_parent(mediaData->audio_data.convert);
-    gst_element_sync_state_with_parent(mediaData->audio_data.sink);
-    gst_element_sync_state_with_parent(mediaData->audio_data.resample);
-    gst_element_sync_state_with_parent(mediaData->audio_data.volume);
-    GstPad *sink_pad = gst_element_get_static_pad(mediaData->audio_data.queue, "sink");
     ret = gst_pad_link (new_pad, sink_pad);
     if (GST_PAD_LINK_FAILED (ret)) {
         g_print ("Type is '%s' but link failed.\n", new_pad_type);
@@ -199,8 +183,8 @@ void HandlerGStreamer::startPipeline()
     /* Create the empty pipeline */
     m_videoData.pipeline = gst_pipeline_new ("rtsp-pipeline");
 
-    if (!m_videoData.pipeline || !m_videoData.source || !m_videoData.queue || !m_videoData.convert || !m_videoData.textoverlay || !m_videoData.sink ||
-        !m_audioData.queue || !m_audioData.convert ||!m_audioData.resample ||!m_audioData.volume ||!m_audioData.sink) {
+    if (!m_videoData.pipeline || !m_videoData.source || !m_videoData.convert || !m_videoData.textoverlay || !m_videoData.sink || !m_audioData.convert
+        ||!m_audioData.resample ||!m_audioData.volume ||!m_audioData.sink) {
         qDebug() << "Not all elements could be created.";
         return;
     }
@@ -217,10 +201,8 @@ void HandlerGStreamer::startPipeline()
 
     /* Build the pipeline. Note that we are NOT linking the source at this
     point. We will do it later. */
-    // gst_bin_add_many (GST_BIN (m_videoData.pipeline), m_videoData.source, m_videoData.queue, m_videoData.convert, m_videoData.textoverlay, m_videoData.sink, m_audioData.queue,
-    //                  m_audioData.convert, m_audioData.sink, m_audioData.resample, m_audioData.volume, nullptr);
-
-    gst_bin_add_many(GST_BIN (m_videoData.pipeline), m_videoData.source, m_videoData.queue, m_videoData.convert, m_videoData.textoverlay, m_videoData.sink, nullptr);
+    gst_bin_add_many (GST_BIN (m_videoData.pipeline), m_videoData.source, m_videoData.convert, m_videoData.textoverlay, m_videoData.sink,
+                     m_audioData.convert, m_audioData.sink, m_audioData.resample, m_audioData.volume, nullptr);
 
     //without audio
 
@@ -228,18 +210,18 @@ void HandlerGStreamer::startPipeline()
 
 
 
-    if (!gst_element_link_many (m_videoData.queue, m_videoData.convert, m_videoData.textoverlay, m_videoData.sink, nullptr)) {
+    if (!gst_element_link_many (m_videoData.convert, m_videoData.textoverlay, m_videoData.sink, nullptr)) {
         qDebug() << "Elements video could not be linked.";
         gst_object_unref (m_videoData.pipeline);
         return;
     }
 
-    // if(!gst_element_link_many(m_audioData.queue, m_audioData.convert, m_audioData.resample, m_audioData.volume, m_audioData.sink, nullptr))
-    // {
-    //     qDebug() << "Elements audio could not be linked.";
-    //     gst_object_unref (m_videoData.pipeline);
-    //     return;
-    // }
+    if(!gst_element_link_many(m_audioData.convert, m_audioData.resample, m_audioData.volume, m_audioData.sink, nullptr))
+    {
+        qDebug() << "Elements audio could not be linked.";
+        gst_object_unref (m_videoData.pipeline);
+        return;
+    }
 
     // Set the URI to play
     QByteArray baRtspLink = m_rtspLink.toUtf8();
@@ -257,7 +239,7 @@ void HandlerGStreamer::startPipeline()
 
     /* Connect to the pad-added signal */
     g_signal_connect (m_videoData.source, "pad-added", G_CALLBACK (pad_added_video), &m_videoData);
-    g_signal_connect (m_videoData.source, "pad-added", G_CALLBACK (pad_added_audio), &m_mediaData);
+    g_signal_connect (m_videoData.source, "pad-added", G_CALLBACK (pad_added_audio), &m_audioData);
 
     /* Start playing */
     GstStateChangeReturn ret;
@@ -289,17 +271,14 @@ void HandlerGStreamer::startPipeline()
 void HandlerGStreamer::createGstElements()
 {
     m_videoData.source = gst_element_factory_make ("uridecodebin", "source");
-    m_videoData.queue = gst_element_factory_make("queue", "video_queue");
+    //m_videoData.source = gst_element_factory_make ("rtspsrc", "source");
     m_videoData.convert = gst_element_factory_make ("videoconvert", "video_convert");
     m_videoData.textoverlay = gst_element_factory_make("textoverlay","text");
     m_videoData.sink = gst_element_factory_make ("d3dvideosink", "video_sink");
-    m_audioData.queue = gst_element_factory_make("queue", "audio_queue");
     m_audioData.convert = gst_element_factory_make("audioconvert", "audio_convert");
     m_audioData.resample = gst_element_factory_make("audioresample", "audio_resample");
     m_audioData.volume = gst_element_factory_make("volume", "volume");
     m_audioData.sink = gst_element_factory_make("autoaudiosink", "audio_sink");
-    m_mediaData.video_data = m_videoData;
-    m_mediaData.audio_data = m_audioData;
 }
 
 

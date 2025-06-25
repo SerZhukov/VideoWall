@@ -6,7 +6,6 @@
 struct VideoData {
     GstElement *pipeline = nullptr;
     GstElement *source = nullptr;
-    GstElement* queue = nullptr;
     GstElement *convert = nullptr;
     GstElement *textoverlay = nullptr;
     GstElement *sink = nullptr;
@@ -14,7 +13,6 @@ struct VideoData {
     {
         pipeline = nullptr;
         source = nullptr;
-        queue = nullptr;
         convert = nullptr;
         textoverlay = nullptr;
         sink = nullptr;
@@ -23,14 +21,12 @@ struct VideoData {
 
 struct AudioData
 {
-    GstElement* queue = nullptr;
     GstElement *convert =  nullptr;
     GstElement *resample = nullptr;
     GstElement *volume = nullptr;
     GstElement *sink = nullptr;
     void clear()
     {
-        queue = nullptr;
         convert =  nullptr;
         resample = nullptr;
         volume = nullptr;
