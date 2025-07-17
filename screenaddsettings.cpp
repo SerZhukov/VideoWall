@@ -12,11 +12,13 @@ ScreenAddSettings::ScreenAddSettings(QWidget* parent) : QDialog(parent)
     m_nameObject = new QLabel("Введите название объекта:");
     m_nameObject->setFixedHeight(10);
     m_inputNameObject = new QLineEdit;
-    m_btnAddCover = new QPushButton("Выбрать обложку");
+    m_btnAddCover = new QPushButton("Добавить обложку");
+    m_btnAddVideo = new QPushButton("Добавить видео");
     m_btnAddRTSP = new QPushButton("Настройки RTSP");
     m_layout->addWidget(m_nameObject);
     m_layout->addWidget(m_inputNameObject);
     m_layout->addWidget(m_btnAddCover);
+    m_layout->addWidget(m_btnAddVideo);
     m_layout->addWidget(m_btnAddRTSP);
     // интерфейс для сохранения или закрытия настроек
     m_btnAdd = new QPushButton("Добавить объект");
@@ -29,6 +31,7 @@ ScreenAddSettings::ScreenAddSettings(QWidget* parent) : QDialog(parent)
 
     m_currentStreamConfig = new StreamConfig(this);
     m_coverManager = new CoverManager(this);
+    m_videoSaveManager = new VideoSaveManager(this);
 
     //настройки отображения диалогового окна
     setModal(true);
@@ -52,6 +55,8 @@ ScreenAddSettings::ScreenAddSettings(QWidget* parent) : QDialog(parent)
      m_transmitterChangeSettings = SingletonTransmitter::instance();
     //open select window a cover
      connect(m_btnAddCover, &QPushButton::clicked, m_coverManager, &CoverManager::importCover);
+     //open select window a video
+     connect(m_btnAddVideo, &QPushButton::clicked, m_videoSaveManager, &VideoSaveManager::addVideo);
 }
 
 ScreenAddSettings::~ScreenAddSettings()
@@ -64,6 +69,8 @@ void ScreenAddSettings::writeSettings()
     QString nameObject = m_currentStreamConfig->getName();
     QMultiMap<QString, QString> rtspLinks = m_currentStreamConfig->getRtspLinkMap();
     manager.saveData(nameObject, rtspLinks);
+    QMultiMap<QString, QString> videoPaths = m_videoSaveManager->getVideoLinkMap();
+    manager.saveData(nameObject, videoPaths);
     QString pathCover = m_coverManager->getNewPathCover();
     //pathCover will be empty if user does not choose the cover
     if(!pathCover.isEmpty())

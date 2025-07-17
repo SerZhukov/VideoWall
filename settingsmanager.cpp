@@ -15,12 +15,17 @@ QSettings SettingsManager::m_settings("SZ", "VideoWall");
 
 void SettingsManager::saveData(const QString &nameObject, const QMultiMap<QString, QString> &rtspLinks)
 {
-    m_settings.beginGroup(nameObject);   
+    m_settings.beginGroup(nameObject);
     for (auto it = rtspLinks.cbegin(); it != rtspLinks.end(); ++it)
     {
         m_settings.setValue(it.key(), it.value());
     }
     m_settings.endGroup();
+}
+
+void SettingsManager::saveDataAlt(const QString &nameObject, const MediaSource &mediaSource)
+{
+
 }
 
 void SettingsManager::saveCover(const QString &nameObject, const QString &pathCover)
@@ -33,23 +38,6 @@ void SettingsManager::saveCover(const QString &nameObject, const QString &pathCo
 }
 
 
-// QMap<QString, QMultiMap<QString, QString>> SettingsManager::loadData() const
-// {
-//     QMap<QString, QMultiMap<QString, QString>> objectRtspLinks;
-//     const QList groups = m_settings.childGroups();
-//     for (const QString& group : groups) {
-//         m_settings.beginGroup(group);
-//         const QStringList keys = m_settings.allKeys();
-//          QMultiMap<QString, QString> rtspLinks;
-//         for (const QString& key : keys) {
-//             QString rtsp = m_settings.value(key).toString();
-//             rtspLinks.insert(key, rtsp);
-//         }
-//         objectRtspLinks.insert(group, rtspLinks);
-//         m_settings.endGroup();
-//     }
-//     return objectRtspLinks;
-// }
 
 QMap<QString, StreamGroupData> SettingsManager::load()
 {

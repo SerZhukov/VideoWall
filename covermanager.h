@@ -8,6 +8,7 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
+#include "mediasource.h"
 
 class CoverManager : public QWidget
 {

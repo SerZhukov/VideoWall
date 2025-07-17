@@ -17,26 +17,23 @@ const QString &StreamConfig::getName() const
     return m_name;
 }
 
-const QString &StreamConfig::getPathCover() const
-{
-    return m_pathCover;
-}
-
 const QMultiMap<QString, QString> &StreamConfig::getRtspLinkMap() const
 {
     return m_rtspMap;
+}
+
+const MediaSource &StreamConfig::getMediaData()
+{
+    m_mediaSource.source = m_rtspMap;
+    m_mediaSource.type = Type::Rtsp;
+    m_mediaSource.settingsGroupName = "Rtsp";
+    return m_mediaSource;
 }
 
 void StreamConfig::setName(const QString &name)
 {
     m_name = name;
 }
-
-void StreamConfig::setPathCover(const QString &path)
-{
-    m_pathCover = path;
-}
-
 
 void StreamConfig::addRtspLink(const QMultiMap<QString, QString> &rtspMap)
 {  

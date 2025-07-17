@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QMultiMap>
 
+#include "mediasource.h"
+
 class StreamConfig : public QObject
 {
     Q_OBJECT
@@ -13,17 +15,16 @@ public:
 
 private:
     QString m_name;
-    QString m_pathCover;
     QMultiMap<QString, QString> m_rtspMap;
+    MediaSource m_mediaSource;
 
 public:
     const QString& getName() const;
-    const QString& getPathCover() const;
     const QMultiMap<QString, QString>& getRtspLinkMap() const;
+    const MediaSource& getMediaData();
 
 public slots:
     void setName(const QString& name);
-    void setPathCover(const QString& path);
     void addRtspLink(const QMultiMap<QString, QString>& rtspMap);
 
 };

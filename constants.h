@@ -3,11 +3,12 @@
 #include <Qt>
 
 namespace Roles {
-    enum
+    enum Roles
     {
         Display = Qt::DisplayRole,
         Rtsp = Qt::UserRole + 1,
-        Cover
+        Cover,
+        Video,
     };
 }
 

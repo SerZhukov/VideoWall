@@ -74,6 +74,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         resource.qrc
         loadingwidget.h loadingwidget.cpp
         streamcontext.h streamcontext.cpp
+        bus_callbackRTSP.h
+        bus_callbackRTSP.cpp
+        videosavemanager.h
+        videosavermanager.cpp
+        mediasource.h
+
 
     )
 # Define target properties for Android with Qt 6 as:

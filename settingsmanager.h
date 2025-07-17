@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSettings>
 #include "isettingsmanager.h"
+#include "mediasource.h"
 
 struct StreamGroupData {
     QMultiMap<QString, QString> rtspLinks;
@@ -19,6 +20,8 @@ public:
     virtual ~ SettingsManager();
     //запись объекта и rtsp ссылок в реестр OC используя функционал QSettings
     void saveData(const QString& nameObject, const QMultiMap<QString, QString>& rtspLinks) override;
+
+    void saveDataAlt(const QString& nameObject, const MediaSource& mediaSource);
     //запись настроек обложки
     void saveCover(const QString& nameObject, const QString& pathCover);
     //выгрузка объектов и rtsp ссылок в QMap    

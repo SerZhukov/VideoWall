@@ -19,11 +19,11 @@ class HandlerGStreamer : public QThread, public IGStreamerDataProvider, public I
 public:
     explicit HandlerGStreamer(StreamContext* streamContext, QObject *parent = nullptr);
     void stopLoop() override;
-    const VideoData& getData() override;
+    const VideoData& getDataVideo() override;
+    const VideoDataRTSP& getDataRTSP() override;
     void emitStartRtspStream();
     void emitSendLoadInfo(const QString& str);
     ~HandlerGStreamer();
-
 public slots:
     void setRtsp(const QString& rtspLink);
     void setWinId(const WId wid);
@@ -38,20 +38,27 @@ protected:
 private:
     StreamContext* m_streamContext;
     QString m_rtspLink;
+    QString m_pathVideo;
     QString m_overlayText;
-    VideoData m_videoData;
-    AudioData m_audioData;
+    VideoDataRTSP m_videoDataRTSP;
+    VideoData m_videoDataVideo;
     WId m_wid;
-    guint bus_watch_id;
+    guint m_bus_watch_id;
     //This variable is necessary to run the main loop
     GMainLoop* loop;
     // This function will be called by the pad-added signal
-    static void pad_added_video(GstElement* src, GstPad* new_pad, VideoData* data);
-    static void pad_added_audio(GstElement* src, GstPad* new_pad, AudioData* data);
+    static void pad_added_rtspsrc(GstElement* src, GstPad* new_pad, VideoDataRTSP* data);
+    static void pad_added_video_decoder(GstElement* src, GstPad* new_pad, VideoDataRTSP* data);
+    static void pad_added_audio_decoder(GstElement* src, GstPad* new_pad, VideoDataRTSP* data);
+
+    static void pad_added_videosrc(GstElement* src, GstPad* new_pad, VideoData* videoData);
     //Start main pipeline
-    void startPipeline();
+    void startPipelineRTSP();
+    //start video pipeline
+     void startPipelineVideo();
     //create Gst elements
-    void createGstElements();
+    void createGstElementsRTSP();
+    void createGstElementsVideo();
 
 signals:
     void videoStopped();

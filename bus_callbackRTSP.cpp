@@ -9,15 +9,14 @@
 
 /*Callback function for handling messages from the bus*/
 
-gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data = nullptr)
+gboolean bus_callbackRTSP(GstBus *bus, GstMessage *message, gpointer data = nullptr)
 {
-
     //qDebug() << "Recived message: " << GST_MESSAGE_TYPE(message);
     HandlerGStreamer* ptrPlayer = static_cast<HandlerGStreamer*>(data);
     IBusCallback* iBusCallback = dynamic_cast<HandlerGStreamer*>(ptrPlayer);
     IGStreamerDataProvider*  iPlayerData = dynamic_cast<HandlerGStreamer*>(ptrPlayer);
 
-    VideoData dataPlayer = iPlayerData->getDataVideo();
+    VideoDataRTSP dataPlayer = iPlayerData->getDataRTSP();
     if(!dataPlayer.pipeline)
     {
         QString logInfo = "CustomData is not valid";

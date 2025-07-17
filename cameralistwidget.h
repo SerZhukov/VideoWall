@@ -27,7 +27,6 @@ private:
 public slots:
     void setData(const QMap<QString, StreamGroupData>& data);
 
-
 };
 
 #endif // CAMERALISTWIDGET_H
