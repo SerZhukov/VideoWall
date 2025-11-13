@@ -9,6 +9,14 @@ QMultiMap<QString, QString> VideoSaveManager::getVideoLinkMap()
     return m_videoLinks;
 }
 
+const MediaSource &VideoSaveManager::getMediaData()
+{
+    m_mediaSource.source = m_videoLinks;
+    m_mediaSource.type = Type::Video;
+    m_mediaSource.settingsGroupName = "Video";
+    return m_mediaSource;
+}
+
 bool VideoSaveManager::addVideo()
 {
     QString path = QFileDialog::getOpenFileName(this, "Выбор видео", QDir::homePath(), "Видео (*.mp4 *.avi *.mkv *.mov *.flv *.wmv *.mpeg *.mpg *.webm)");
@@ -18,7 +26,6 @@ bool VideoSaveManager::addVideo()
     }
     QString pathUrl = convertUri(path);
     QString nameVideo = getNameVideo(path);
-
     m_videoLinks.insert(nameVideo, pathUrl);
     return true;
 }

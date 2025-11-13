@@ -18,8 +18,8 @@ class HandlerGStreamer : public QThread, public IGStreamerDataProvider, public I
     Q_OBJECT
 public:
     explicit HandlerGStreamer(StreamContext* streamContext, QObject *parent = nullptr);
+    explicit HandlerGStreamer(QObject *parent = nullptr);
     void stopLoop() override;
-    const VideoData& getDataVideo() override;
     const VideoDataRTSP& getDataRTSP() override;
     void emitStartRtspStream();
     void emitSendLoadInfo(const QString& str);
@@ -38,32 +38,26 @@ protected:
 private:
     StreamContext* m_streamContext;
     QString m_rtspLink;
-    QString m_pathVideo;
     QString m_overlayText;
     VideoDataRTSP m_videoDataRTSP;
-    VideoData m_videoDataVideo;
     WId m_wid;
     guint m_bus_watch_id;
     //This variable is necessary to run the main loop
-    GMainLoop* loop;
+    GMainLoop* loop = nullptr;
     // This function will be called by the pad-added signal
     static void pad_added_rtspsrc(GstElement* src, GstPad* new_pad, VideoDataRTSP* data);
     static void pad_added_video_decoder(GstElement* src, GstPad* new_pad, VideoDataRTSP* data);
     static void pad_added_audio_decoder(GstElement* src, GstPad* new_pad, VideoDataRTSP* data);
-
-    static void pad_added_videosrc(GstElement* src, GstPad* new_pad, VideoData* videoData);
     //Start main pipeline
     void startPipelineRTSP();
-    //start video pipeline
-     void startPipelineVideo();
     //create Gst elements
     void createGstElementsRTSP();
-    void createGstElementsVideo();
-
+    bool m_connected = false;
+    bool m_stopped = false;
 signals:
     void videoStopped();
     void startRtspStream();
-    void stopRtspStreap();
+    void errorConnectRtspStream();
     void pauseRtspStream();
     void sendLoadInfo(const QString&);
 

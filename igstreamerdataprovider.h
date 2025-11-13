@@ -7,7 +7,6 @@ class IGStreamerDataProvider
 public:
     IGStreamerDataProvider();
     virtual ~ IGStreamerDataProvider() = default;
-    virtual const VideoData& getDataVideo() = 0;
     virtual const VideoDataRTSP& getDataRTSP() = 0;
 
 };

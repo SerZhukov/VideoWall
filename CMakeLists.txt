@@ -79,6 +79,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         videosavemanager.h
         videosavermanager.cpp
         mediasource.h
+        handlervideogstreamer.h
+        handlervideogstreamer.cpp
+
+
+        errorwidget.h errorwidget.cpp
+
+
+
 
 
     )

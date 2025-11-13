@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QMultiMap>
-
 #include "mediasource.h"
 
 class StreamConfig : public QObject
@@ -20,7 +19,6 @@ private:
 
 public:
     const QString& getName() const;
-    const QMultiMap<QString, QString>& getRtspLinkMap() const;
     const MediaSource& getMediaData();
 
 public slots:

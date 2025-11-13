@@ -32,6 +32,8 @@ ScreenAddSettings::ScreenAddSettings(QWidget* parent) : QDialog(parent)
     m_currentStreamConfig = new StreamConfig(this);
     m_coverManager = new CoverManager(this);
     m_videoSaveManager = new VideoSaveManager(this);
+    //object singleton transmitting signal about changing settings
+    m_transmitterChangeSettings = SingletonTransmitter::instance();
 
     //настройки отображения диалогового окна
     setModal(true);
@@ -45,14 +47,9 @@ ScreenAddSettings::ScreenAddSettings(QWidget* parent) : QDialog(parent)
     connect(m_inputNameObject, &QLineEdit::editingFinished, this, [this]() {
         m_currentStreamConfig->setName(m_inputNameObject->text());
     });
-    //writes name of object to CoverManager
-    connect(m_inputNameObject, &QLineEdit::editingFinished, this, [this]() {
-        m_coverManager->setNameCover(m_inputNameObject->text());
-    });
     //save settings
     connect(m_btnAdd, &QPushButton::clicked, this, &ScreenAddSettings::writeSettings);
-    //object singleton transmitting signal about changing settings
-     m_transmitterChangeSettings = SingletonTransmitter::instance();
+
     //open select window a cover
      connect(m_btnAddCover, &QPushButton::clicked, m_coverManager, &CoverManager::importCover);
      //open select window a video
@@ -67,16 +64,12 @@ void ScreenAddSettings::writeSettings()
 {
     SettingsManager manager;
     QString nameObject = m_currentStreamConfig->getName();
-    QMultiMap<QString, QString> rtspLinks = m_currentStreamConfig->getRtspLinkMap();
-    manager.saveData(nameObject, rtspLinks);
-    QMultiMap<QString, QString> videoPaths = m_videoSaveManager->getVideoLinkMap();
-    manager.saveData(nameObject, videoPaths);
-    QString pathCover = m_coverManager->getNewPathCover();
-    //pathCover will be empty if user does not choose the cover
-    if(!pathCover.isEmpty())
-    {
-        manager.saveCover(nameObject, pathCover);
-    }
+    MediaSource sourceRtsp = m_currentStreamConfig->getMediaData();
+    manager.saveData(nameObject, sourceRtsp);
+    MediaSource sourceVideo = m_videoSaveManager->getMediaData();
+    manager.saveData(nameObject, sourceVideo);
+    MediaSource sourceCover = m_coverManager->getMediaData();
+    manager.saveData(nameObject, sourceCover);
     m_transmitterChangeSettings->notifySettingsModified();
 }
 

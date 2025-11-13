@@ -6,10 +6,13 @@
 #include <gst/video/video.h>
 #include <glib.h>
 #include "esckeyfilter.h"
+#include <QStyleFactory>
 
 int main(int argc, char *argv[])
 {
+
     QApplication a(argc, argv);
+    QApplication::setStyle("Fusion");
     QScreen* screen = QGuiApplication::primaryScreen();
     QSize sizeScreen = screen->size();
     MainWindow mainWindow;

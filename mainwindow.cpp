@@ -23,7 +23,7 @@ void MainWindow::openScreenAddSettings()
     m_scrAddSettings = new ScreenAddSettings(this);
     if(m_scrAddSettings->exec() == QDialog::Accepted)
     {
-        qDebug() << "Successful";
+        //qDebug() << "Successful";
     }
     else
     {
@@ -58,11 +58,15 @@ bool MainWindow::isInFullScreenMode()
 QToolBar *MainWindow::createToolBar()
 {
 
-    m_ptb = new QToolBar(this);
+    m_ptb = new QToolBar;
+    m_titleLabel = new QLabel;
+    m_titleLabel->setText("    X5 VideoWall    ");
+    m_titleLabel->setStyleSheet("color: green; font-size: 24px; font-weight: bold;");
+    m_ptb->addWidget(m_titleLabel);
     m_ptb->addAction(QPixmap("://resources//icon_add.jpg"), "add object", this, &MainWindow::openScreenAddSettings);
     m_ptb->addAction(QPixmap("://resources//icon_screens.jpg"), "split screen", this, &MainWindow::openScreenPartitionButtons);
     m_ptb->addAction(QPixmap("://resources//icon_full_screen.jpg"), "full screen", this, &MainWindow::enableFullScreen);
-    QWidget *spacer = new QWidget(this);
+    QWidget *spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_ptb->addWidget(spacer);
     m_ptb->addAction(QPixmap("://resources//icon_cam.jpg"), "cam list", m_workSreens, &WorkSreens::toggleCameraListWidget);
@@ -71,6 +75,7 @@ QToolBar *MainWindow::createToolBar()
     m_ptb->setPalette(pal);
     m_ptb->setAutoFillBackground(true);
     m_ptb->setIconSize(QSize(32, 32));
+    m_ptb->setMovable(false);
     return m_ptb;
 }
 

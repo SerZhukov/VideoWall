@@ -2,9 +2,7 @@
 #include <glib.h>
 #include <QDebug>
 #include "GStreamerData.h"
-#include "ibuscallback.h"
-#include "igstreamerdataprovider.h"
-#include "handlergstreamer.h"
+#include "handlervideogstreamer.h"
 #include <QTextStream>
 
 /*Callback function for handling messages from the bus*/
@@ -12,12 +10,8 @@
 gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data = nullptr)
 {
 
-    //qDebug() << "Recived message: " << GST_MESSAGE_TYPE(message);
-    HandlerGStreamer* ptrPlayer = static_cast<HandlerGStreamer*>(data);
-    IBusCallback* iBusCallback = dynamic_cast<HandlerGStreamer*>(ptrPlayer);
-    IGStreamerDataProvider*  iPlayerData = dynamic_cast<HandlerGStreamer*>(ptrPlayer);
-
-    VideoData dataPlayer = iPlayerData->getDataVideo();
+    HandlerVideoGStreamer* ptrPlayer = static_cast<HandlerVideoGStreamer*>(data);
+    VideoData dataPlayer = ptrPlayer->getDataVideo();
     if(!dataPlayer.pipeline)
     {
         QString logInfo = "CustomData is not valid";
@@ -41,7 +35,6 @@ gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data = nullptr)
         ptrPlayer->emitSendLoadInfo(logInfo);
         g_error_free(err);
         g_free(debug);
-        //iBusCallback->stopLoop();
         break;
     }
     case GST_MESSAGE_EOS:
@@ -49,7 +42,7 @@ gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data = nullptr)
         qDebug() << "End-Of-Stream reached.";
         QString logInfo = "End-Of-Stream reached.";
         ptrPlayer->emitSendLoadInfo(logInfo);
-        iBusCallback->stopLoop();
+        ptrPlayer->stopLoop();
         break;
     }
     case GST_MESSAGE_STATE_CHANGED:
@@ -67,7 +60,7 @@ gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data = nullptr)
             ptrPlayer->emitSendLoadInfo(logInfo);
             if(new_state == GST_STATE_PLAYING)
             {
-                ptrPlayer->emitStartRtspStream();
+                ptrPlayer->emitStartVideo();
             }
         }
         break;

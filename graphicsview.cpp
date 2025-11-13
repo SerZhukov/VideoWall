@@ -34,6 +34,7 @@ void GraphicsView::dragEnterEvent(QDragEnterEvent *event)
 
 void GraphicsView::dropEvent(QDropEvent *event)
 {
+
     clearDropInfo();
     const QMimeData* mimeData = event->mimeData();
     QByteArray encoded = mimeData->data("application/x-qabstractitemmodeldatalist");
@@ -51,26 +52,39 @@ void GraphicsView::dropEvent(QDropEvent *event)
             if (it.key() == Roles::Cover)
             {
                 m_pathCover = str;
+                m_role = Roles::Cover;
             }
             if(it.key() == Roles::Rtsp)
             {
                 m_rtspLink = str;
+                m_role = Roles::Rtsp;
             }
             if(it.key() == Roles::Display)
             {
                 m_textOverlay = str;
             }
+            if(it.key() == Roles::Video)
+            {
+                m_pathVideo = str;
+                m_role = Roles::Video;
+            }
         }
     }
-    if(m_pathCover.isEmpty())
+    if(m_role == Roles::Rtsp)
     {
         emit rtspLinkDropped(m_rtspLink);
         emit textOverlayDropped(m_textOverlay);
         emit startRtspStream();
     }
-    else
+    if(m_role == Roles::Cover)
     {
         emit coverPathDropped(m_pathCover);
+    }
+    if(m_role == Roles::Video)
+    {
+        emit videoPathDropped(m_pathVideo);
+        emit startVideoStream();
+
     }
 }
 
@@ -100,21 +114,21 @@ void GraphicsView::clearDropInfo()
     m_pathCover.clear();
 }
 
-void GraphicsView::updateRenderRect()
-{
-    GstElement *sink = m_streamContex->getVideoData().sink;
-    if(!sink)
-    {
-        qDebug() << "Sink is not valid";
-        return;
-    }
-    int w = this->width();
-    qDebug() << "w = " << w;
-    int h = this->height();
-    qDebug() << "h = " << h;
-    gst_video_overlay_set_render_rectangle(GST_VIDEO_OVERLAY(sink), 0, 0, w, h);
-    gst_video_overlay_expose(GST_VIDEO_OVERLAY(sink));
-}
+// void GraphicsView::updateRenderRect()
+// {
+//     GstElement *sink = m_streamContex->getVideoData().sink;
+//     if(!sink)
+//     {
+//         qDebug() << "Sink is not valid";
+//         return;
+//     }
+//     int w = this->width();
+//     qDebug() << "w = " << w;
+//     int h = this->height();
+//     qDebug() << "h = " << h;
+//     gst_video_overlay_set_render_rectangle(GST_VIDEO_OVERLAY(sink), 0, 0, w, h);
+//     gst_video_overlay_expose(GST_VIDEO_OVERLAY(sink));
+// }
 
 
 

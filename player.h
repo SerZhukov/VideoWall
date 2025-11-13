@@ -4,7 +4,8 @@
 #include <QWidget>
 #include "videoplayer.h"
 #include "handlergstreamer.h"
-#include "streamcontext.h"
+#include "handlervideogstreamer.h"
+//#include "streamcontext.h"
 #include <QVBoxLayout>
 
 class Player : public QWidget
@@ -14,9 +15,11 @@ public:
     explicit Player(QWidget *parent = nullptr);
     ~Player();
 public slots:
-    void play();
+    void playVideo();
+    void playRTSP();
 private:
     HandlerGStreamer* m_handlerGSt;
+    HandlerVideoGStreamer* m_handlerVideo;
     VideoPlayer* m_screen;
     StreamContext* m_streamContex;
     QVBoxLayout* m_layout;

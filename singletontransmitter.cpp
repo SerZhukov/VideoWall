@@ -11,4 +11,4 @@ SignalTransmitter *SingletonTransmitter::instance()
     return &transmitter;
 }
 
-//SignalTransmitter SingletonTransmitter::transmitter;
+

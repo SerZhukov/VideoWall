@@ -74,7 +74,6 @@ void RtspInputDisplay::addSection()
 
 void RtspInputDisplay::deleteSection(QLayout *layout)
 {
-    qDebug() << "void RtspInputDisplay::deleteSection(QLayout *layout)";
     if(layout == nullptr)
     {
         return;

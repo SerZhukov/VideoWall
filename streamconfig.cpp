@@ -17,12 +17,8 @@ const QString &StreamConfig::getName() const
     return m_name;
 }
 
-const QMultiMap<QString, QString> &StreamConfig::getRtspLinkMap() const
-{
-    return m_rtspMap;
-}
 
-const MediaSource &StreamConfig::getMediaData()
+const MediaSource& StreamConfig::getMediaData()
 {
     m_mediaSource.source = m_rtspMap;
     m_mediaSource.type = Type::Rtsp;

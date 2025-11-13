@@ -10,5 +10,8 @@
         <file>resources/icon_video_green.png</file>
         <file>resources/load_animation.gif</file>
         <file>resources/load_animation_connect.gif</file>
+        <file>resources/reconnect.png</file>
+        <file>resources/close.png</file>
+        <file>resources/screen_error.png</file>
     </qresource>
 </RCC>

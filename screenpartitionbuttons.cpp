@@ -4,22 +4,22 @@ ScreenPartitionButtons::ScreenPartitionButtons(QWidget *parent)
     : QDialog{parent}
 {
     resize(100,100);
-    layout_ = new QGridLayout;
-    btnOnePart_ = new QPushButton("1");
-    btnFourPart_ = new QPushButton("4");
-    btnNinePart_ = new QPushButton("9");
-    btnSixteenPart_ = new QPushButton("16");
-    layout_->addWidget(btnOnePart_, 0, 0);
-    layout_->addWidget(btnFourPart_, 0, 1);
-    layout_->addWidget(btnNinePart_, 1, 0);
-    layout_->addWidget(btnSixteenPart_, 1, 1);
-    setLayout(layout_);
+    m_layout = new QGridLayout;
+    m_btnOnePart = new QPushButton("1");
+    m_btnFourPart = new QPushButton("4");
+    m_btnNinePart = new QPushButton("9");
+    m_btnSixteenPart = new QPushButton("16");
+    m_layout->addWidget(m_btnOnePart, 0, 0);
+    m_layout->addWidget(m_btnFourPart, 0, 1);
+    m_layout->addWidget(m_btnNinePart, 1, 0);
+    m_layout->addWidget(m_btnSixteenPart, 1, 1);
+    setLayout(m_layout);
     setModal(true);
     setWindowTitle("Настройки экрана");
-    connect(btnOnePart_, &QPushButton::clicked, this, &ScreenPartitionButtons::partitionOneScreens);
-    connect(btnFourPart_, &QPushButton::clicked, this, &ScreenPartitionButtons::partitionFourScreens);
-    connect(btnNinePart_, &QPushButton::clicked, this, &ScreenPartitionButtons::partitionNineScreens);
-    connect(btnSixteenPart_, &QPushButton::clicked, this, &ScreenPartitionButtons::partitionSixteenScreens);
+    connect(m_btnOnePart, &QPushButton::clicked, this, &ScreenPartitionButtons::partitionOneScreens);
+    connect(m_btnFourPart, &QPushButton::clicked, this, &ScreenPartitionButtons::partitionFourScreens);
+    connect(m_btnNinePart, &QPushButton::clicked, this, &ScreenPartitionButtons::partitionNineScreens);
+    connect(m_btnSixteenPart, &QPushButton::clicked, this, &ScreenPartitionButtons::partitionSixteenScreens);
 }
 
 void ScreenPartitionButtons::partitionOneScreens()

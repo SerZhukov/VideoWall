@@ -5,14 +5,15 @@ VideoPlayer::VideoPlayer(StreamContext* streamContext, QWidget *parent)
 {
     m_scene = new QGraphicsScene;
     m_view = new GraphicsView(m_streamContex, m_scene);
-
     setAcceptDrops(true);
     m_view->setLineWidth(1);
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_loadingWidget = new LoadingWidget;
+    m_errorWidget = new ErrorWidget;
     m_stackedLayout = new QStackedLayout;
     m_stackedLayout->addWidget(m_view);
     m_stackedLayout->addWidget(m_loadingWidget);
+    m_stackedLayout->addWidget(m_errorWidget);
     m_layout = new QVBoxLayout;
     m_layout->addLayout(m_stackedLayout);
     m_layout->setContentsMargins(0,0,0,0);
@@ -24,12 +25,20 @@ VideoPlayer::VideoPlayer(StreamContext* streamContext, QWidget *parent)
     m_scene->addItem(m_background);
     m_view->fitInView(m_background, Qt::IgnoreAspectRatio);
     m_view->centerOn(m_background);
+    m_hintText = m_scene->addText("Drag a camera here to start monitoring.", QFont("Arial", 45));
+    QRectF sceneRect = m_scene->sceneRect();
+    QRectF textRect = m_hintText->boundingRect();
+    m_hintText->setPos(sceneRect.center() - textRect.center());
     //received the signal about dropping the RTSP link in GraphicsView
     connect(m_view, &GraphicsView::rtspLinkDropped, this, &VideoPlayer::emitRtspLink);
+    //received the signal about dropping the video link in GraphicsView
+    connect(m_view, &GraphicsView::videoPathDropped, this, &VideoPlayer::emitVideoPath);
     //received the signal about dropping the text overlay in GraphicsView
     connect(m_view, &GraphicsView::textOverlayDropped, this, &VideoPlayer::emitTextOverlay);
     //the signal about starting rtsp stream
     connect(m_view, &GraphicsView::startRtspStream, this, &VideoPlayer::emitStartRtspStream);
+    //the signal about starting video stream
+    connect(m_view, &GraphicsView::startVideoStream, this, &VideoPlayer::emitStartVideoStream);
     //set m_pathCover when the cover is dropped onto the widget
     connect(m_view, &GraphicsView::coverPathDropped, this, &VideoPlayer::setCover);
     //received the signal about clearnig screen(stop rtsp stream) in GraphicsView
@@ -40,6 +49,11 @@ VideoPlayer::VideoPlayer(StreamContext* streamContext, QWidget *parent)
         emit clearScreen();
         setVideoScreen();
     });
+    //received the signal about closing ErrorScreen
+    connect(m_errorWidget, &ErrorWidget::closeErrorScreen, this, &VideoPlayer::setVideoScreen);
+    //received the signal about reconnect
+    connect(m_errorWidget, &ErrorWidget::reconnect, this, &VideoPlayer::emitStartRtspStream);
+
 }
 
 VideoPlayer::~VideoPlayer()
@@ -55,6 +69,11 @@ void VideoPlayer::emitRtspLink(const QString &rtspLink)
     emit sendRtspLink(rtspLink);
 }
 
+void VideoPlayer::emitVideoPath(const QString &videoPath)
+{
+    emit sendVideoPath(videoPath);
+}
+
 void VideoPlayer::emitTextOverlay(const QString &textOverlay)
 {
     emit sendTextOverlay(textOverlay);
@@ -66,8 +85,29 @@ void VideoPlayer::emitStartRtspStream()
     {
         deleteCover();
     }
+    if(m_setVideoStream)
+    {
+        emit clearScreen();
+        m_setVideoStream = false;
+    }
     emit startRtspStream();
     m_setRtspStream = true;
+    setLoadScreen();
+}
+
+void VideoPlayer::emitStartVideoStream()
+{
+    if(m_setCover)
+    {
+        deleteCover();
+    }
+    if(m_setRtspStream)
+    {
+        emit clearScreen();
+        m_setRtspStream = false;
+    }
+    emit startVideoStream();
+    m_setVideoStream = true;
     setLoadScreen();
 }
 
@@ -81,6 +121,11 @@ void VideoPlayer::emitClearScreen()
     {
         emit clearScreen();
         m_setRtspStream = false;
+    }
+    else if(m_setVideoStream)
+    {
+        emit clearScreen();
+        m_setVideoStream = false;
     }
     else
     {
@@ -99,7 +144,7 @@ void VideoPlayer::setCover(const QString &coverPath)
     QPixmap cover(coverPath);
     m_cover = new QGraphicsPixmapItem(cover);
     m_scene->setSceneRect(cover.rect());
-    m_scene ->addItem(m_cover);  
+    m_scene->addItem(m_cover);
     m_view->fitInView(m_cover, Qt::IgnoreAspectRatio);
     m_view->centerOn(m_cover);
     m_setCover = true;
@@ -128,16 +173,18 @@ void VideoPlayer::setVideoScreen()
     m_stackedLayout->setCurrentIndex(VIDEO_SCREEN);
 }
 
+void VideoPlayer::setErrorScreen()
+{
+    m_stackedLayout->setCurrentIndex(ERROR_SCREEN);
+}
+
 void VideoPlayer::setLoadScreen()
 {
     m_stackedLayout->setCurrentIndex(LOAD_SCREEN);
     m_loadingWidget->startAnimation();
 }
 
-void VideoPlayer::test()
-{
-    qDebug() << "void VideoPlayer::test()";
-}
+
 
 
 

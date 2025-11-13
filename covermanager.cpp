@@ -5,9 +5,14 @@ CoverManager::CoverManager(QWidget *parent)
     : QWidget{parent}
 {}
 
-const QString &CoverManager::getNewPathCover()
+// const QString &CoverManager::getNewPathCover()
+// {
+//     return m_newPathCover;
+// }
+
+const MediaSource &CoverManager::getMediaData()
 {
-    return m_newPathCover;
+    return m_mediaSource;
 }
 
 bool CoverManager::selectCover()
@@ -18,6 +23,8 @@ bool CoverManager::selectCover()
         return false;
     }
     m_currentPathCover = path;
+    m_nameCover = getNameCover(m_currentPathCover);
+    m_newPathCover = getNewPath();
     return true;
 }
 
@@ -27,13 +34,32 @@ QString CoverManager::getNewPath()
     QString ext = fi.suffix();
     QDir().mkpath(QCoreApplication::applicationDirPath() + "/covers/");
     QString path = QCoreApplication::applicationDirPath() + "/covers/" + m_nameCover + "." + ext;
+    qDebug() << path;
     return path;
 }
 
 bool CoverManager::copyCover(const QString& currentPath, const QString& newPath)
 {
+    qDebug() << currentPath;
+    qDebug() << newPath;
     bool isCopy = QFile::copy(currentPath, newPath);
+    qDebug() << isCopy;
     return isCopy;
+}
+
+QString CoverManager::getNameCover(const QString &path)
+{
+
+    QString nameCover = QFileInfo(path).completeBaseName();
+    qDebug() << nameCover;
+    return nameCover;
+}
+
+void CoverManager::addCover()
+{
+    m_mediaSource.source.insert(m_nameCover, m_newPathCover);
+    m_mediaSource.type = Type::Cover;
+    m_mediaSource.settingsGroupName = "Cover";
 }
 
 
@@ -43,10 +69,9 @@ bool CoverManager::importCover()
     {
         if(!m_nameCover.isEmpty())
         {
-            QString newPath = getNewPath();
-            if(copyCover(m_currentPathCover, newPath))
+            if(copyCover(m_currentPathCover, m_newPathCover))
             {
-                m_newPathCover = newPath;
+                addCover();
                 return true;
             }
         }
@@ -54,7 +79,7 @@ bool CoverManager::importCover()
     return false;
 }
 
-void CoverManager::setNameCover(const QString &nameCover)
-{
-    m_nameCover = nameCover;
-}
+// void CoverManager::setNameCover(const QString &nameCover)
+// {
+//     m_nameCover = nameCover;
+// }

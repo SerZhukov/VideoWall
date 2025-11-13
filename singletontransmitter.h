@@ -7,13 +7,16 @@
 class SingletonTransmitter
 {
 
- SingletonTransmitter();
- SingletonTransmitter(const SingletonTransmitter&) = delete;
- SingletonTransmitter& operator=(const SingletonTransmitter&) = delete;
- //static SignalTransmitter transmitter;
+    SingletonTransmitter();
+    SingletonTransmitter(const SingletonTransmitter&) = delete;
+    SingletonTransmitter& operator=(const SingletonTransmitter&) = delete;
  public:
- static SignalTransmitter* instance();
+    static SignalTransmitter* instance();
 
 };
+
+
+
+
 
 #endif // SINGLETONTRANSMITTER_H

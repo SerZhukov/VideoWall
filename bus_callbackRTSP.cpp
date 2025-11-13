@@ -40,7 +40,7 @@ gboolean bus_callbackRTSP(GstBus *bus, GstMessage *message, gpointer data = null
         ptrPlayer->emitSendLoadInfo(logInfo);
         g_error_free(err);
         g_free(debug);
-        //iBusCallback->stopLoop();
+        iBusCallback->stopLoop();
         break;
     }
     case GST_MESSAGE_EOS:

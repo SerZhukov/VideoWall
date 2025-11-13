@@ -12,8 +12,6 @@
 #include "covermanager.h"
 #include "videosavemanager.h"
 
-
-
 class ScreenAddSettings : public QDialog
 {
     Q_OBJECT

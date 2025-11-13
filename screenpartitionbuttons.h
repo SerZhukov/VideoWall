@@ -11,11 +11,11 @@ class ScreenPartitionButtons : public QDialog
 public:
     explicit ScreenPartitionButtons(QWidget *parent = nullptr);
 private:
-    QGridLayout* layout_;
-    QPushButton* btnOnePart_;
-    QPushButton* btnFourPart_;
-    QPushButton* btnNinePart_;
-    QPushButton* btnSixteenPart_;
+    QGridLayout* m_layout;
+    QPushButton* m_btnOnePart;
+    QPushButton* m_btnFourPart;
+    QPushButton* m_btnNinePart;
+    QPushButton* m_btnSixteenPart;
 private slots:
     void partitionOneScreens();
     void partitionFourScreens();

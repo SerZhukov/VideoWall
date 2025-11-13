@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QUrl>
+#include "mediasource.h"
 
 class VideoSaveManager : public QWidget
 {
@@ -13,10 +14,13 @@ class VideoSaveManager : public QWidget
 public:
     explicit VideoSaveManager(QWidget *parent = nullptr);
     QMultiMap<QString, QString> getVideoLinkMap();
-private:
-    QString getNameVideo(const QString& path);
+    const MediaSource &getMediaData();
+
+private:    
     QMultiMap<QString, QString> m_videoLinks;
     QString convertUri(const QString& path);
+    MediaSource m_mediaSource;
+    QString getNameVideo(const QString& path);
 public slots:
     bool addVideo();
 

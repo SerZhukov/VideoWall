@@ -9,7 +9,10 @@ namespace Roles {
         Rtsp = Qt::UserRole + 1,
         Cover,
         Video,
+        ItemName,
     };
 }
+
+
 
 #endif // CONSTANTS_H

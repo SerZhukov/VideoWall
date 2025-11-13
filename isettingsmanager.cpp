@@ -1,7 +1,7 @@
 #include "isettingsmanager.h"
 
-ISettingsManager::ISettingsManager()
+// ISettingsManager::ISettingsManager()
 
-{
+// {
 
-}
+// }

@@ -5,7 +5,6 @@ LoadingWidget::LoadingWidget(QWidget *parent)
 {
     m_mainLayout = new QVBoxLayout;
     m_areaAnimation = new QLabel;
-
     m_areaLoadInfo = new QLabel;
     m_mainLayout->addWidget(m_areaAnimation, 0, Qt::AlignHCenter);
     m_mainLayout->addWidget(m_areaLoadInfo);
@@ -45,7 +44,6 @@ void LoadingWidget::setTypeAnimation()
 
 void LoadingWidget::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << "void LoadingWidget::keyPressEvent(QKeyEvent *event)";
     if(event->key() == Qt::Key_Delete)
     {
         emit interruptLoad();
@@ -60,8 +58,4 @@ void LoadingWidget::resizeEvent(QResizeEvent *event)
 {
     m_loadAnimation->setScaledSize((event->size())/3);
     QFrame::resizeEvent(event);
-
-    // qDebug() << "QLabel: H - " << m_areaAnimation->size().height() << " W - " << m_areaAnimation->size().width();
-    // qDebug() << "QMovie: H - " << m_loadAnimation->currentImage().size().height() << " W - " << m_loadAnimation->currentImage().size().width();
-    // qDebug() << "Event: H - " << event->size().height() << " W - " << event->size().width();
 }

@@ -24,6 +24,7 @@ private:
     SettingsManager* m_settingsManager;
     QMap<QString, StreamGroupData> m_data;
     void clearCameraList();
+    void deleteItem();
 public slots:
     void setData(const QMap<QString, StreamGroupData>& data);
 

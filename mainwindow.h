@@ -21,10 +21,11 @@ public slots:
     void disableFullScreen();
     bool isInFullScreenMode();
 private:
-    WorkSreens* m_workSreens;
-    ScreenPartitionButtons* m_scrPartitionBtn;
-    ScreenAddSettings* m_scrAddSettings;
-    QToolBar* m_ptb;
+    WorkSreens* m_workSreens = nullptr;
+    ScreenPartitionButtons* m_scrPartitionBtn = nullptr;
+    ScreenAddSettings* m_scrAddSettings = nullptr;
+    QToolBar* m_ptb = nullptr;
+    QLabel* m_titleLabel = nullptr;
     QToolBar* createToolBar();
     bool m_fullScreen = false;
 signals:

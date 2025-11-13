@@ -1,6 +1,5 @@
 #include "handlergstreamer.h"
 #include "bus_callbackRTSP.h"
-#include "bus_callback.h"
 #include <QByteArray>
 
 HandlerGStreamer::HandlerGStreamer(StreamContext* streamContext, QObject *parent)
@@ -9,19 +8,23 @@ HandlerGStreamer::HandlerGStreamer(StreamContext* streamContext, QObject *parent
     // Initialize GStreamer
     gst_init(nullptr, nullptr);
     m_videoDataRTSP.clear();
-    m_videoDataVideo.clear();
 
+}
+
+HandlerGStreamer::HandlerGStreamer(QObject *parent)
+    : QThread{parent}
+{
+    // Initialize GStreamer
+    gst_init(nullptr, nullptr);
+    m_videoDataRTSP.clear();
 }
 
 void HandlerGStreamer::stopLoop()
 {
-    qDebug() << "void Player::stopLoop()";
-    g_main_loop_quit(loop);
-}
-
-const VideoData &HandlerGStreamer::getDataVideo()
-{
-    return m_videoDataVideo;
+    if(loop)
+    {
+        g_main_loop_quit(loop);
+    }
 }
 
 const VideoDataRTSP &HandlerGStreamer::getDataRTSP()
@@ -72,6 +75,7 @@ void HandlerGStreamer::pauseVideo()
 
 void HandlerGStreamer::stopVideo()
 {
+    m_stopped = true;
     stopLoop();
     wait();
     emit videoStopped();
@@ -80,6 +84,8 @@ void HandlerGStreamer::stopVideo()
 void HandlerGStreamer::emitStartRtspStream()
 {
     emit startRtspStream();
+    m_connected = true;
+
 }
 
 void HandlerGStreamer::emitSendLoadInfo(const QString &str)
@@ -90,12 +96,34 @@ void HandlerGStreamer::emitSendLoadInfo(const QString &str)
 void HandlerGStreamer::run()
 {
     startPipelineRTSP();
+    if(m_stopped)
+    {
+        return;
+    }
+    if(!m_connected)
+    {
+       int retryCount = 1;
+        while(retryCount < 1 && !m_connected)
+        {
+            qDebug() << "Trying to reconnect RTSP stream";
+            startPipelineRTSP();
+            retryCount += 1;
+
+        }
+    }
+    if (m_connected)
+    {
+        while(true)
+        {
+            startPipelineRTSP();
+            qDebug() << "Restar RTSP stream";
+        }
+    }
+    emit errorConnectRtspStream();
 }
 
 void HandlerGStreamer::pad_added_rtspsrc(GstElement *src, GstPad *new_pad, VideoDataRTSP *videoData)
 {
-    qDebug() << "pad_added_rtspsrc";
-
     GstCaps *new_pad_caps = nullptr;
     GstStructure *new_pad_struct = nullptr;
     const gchar *new_pad_type = nullptr;
@@ -301,51 +329,6 @@ void HandlerGStreamer::pad_added_audio_decoder(GstElement *src, GstPad *new_pad,
     gst_object_unref (sink_pad);
 }
 
-void HandlerGStreamer::pad_added_videosrc(GstElement *src, GstPad *new_pad, VideoData *videoData)
-{
-    qDebug() << "pad_added_videosrc";
-    GstPad *sink_pad = gst_element_get_static_pad (videoData->queue, "sink");
-    GstPadLinkReturn ret;
-    GstCaps *new_pad_caps = nullptr;
-    GstStructure *new_pad_struct = nullptr;
-    const gchar *new_pad_type = nullptr;
-
-    qDebug() << "Received new pad " << GST_PAD_NAME (new_pad) << " from " << GST_ELEMENT_NAME (src);
-
-    // If our converter is already linked, we have nothing to do here
-    if (gst_pad_is_linked (sink_pad)) {
-        g_print ("We are already linked. Ignoring.\n");
-        // Unreference the sink pad
-        gst_object_unref (sink_pad);
-        return;
-    }
-
-    // Check the new pad's type
-    new_pad_caps = gst_pad_get_current_caps (new_pad);
-    new_pad_struct = gst_caps_get_structure (new_pad_caps, 0);
-    new_pad_type = gst_structure_get_name (new_pad_struct);
-    if (!g_str_has_prefix (new_pad_type, "video/x-raw")) {
-        g_print ("It has type '%s' which is not video/x-raw. Ignoring.\n", new_pad_type);
-        // Unreference the new pad's caps, if we got them
-        if (new_pad_caps != nullptr)
-            gst_caps_unref (new_pad_caps);
-        // Unreference the sink pad
-        gst_object_unref (sink_pad);
-        return;
-    }
-    // Attempt the link
-    ret = gst_pad_link (new_pad, sink_pad);
-    if (GST_PAD_LINK_FAILED (ret)) {
-        g_print ("Type is '%s' but link failed.\n", new_pad_type);
-    } else {
-        g_print ("Link succeeded (type '%s').\n", new_pad_type);
-    }
-    // Unreference the new pad's caps, if we got them
-    if (new_pad_caps != NULL)
-        gst_caps_unref (new_pad_caps);
-    // Unreference the sink pad
-    gst_object_unref (sink_pad);
-}
 
 void HandlerGStreamer::startPipelineRTSP()
 {
@@ -393,6 +376,8 @@ void HandlerGStreamer::startPipelineRTSP()
     QByteArray baRtspLink = m_rtspLink.toUtf8();
     const char* rtspLink = baRtspLink.constData();
     g_object_set(m_videoDataRTSP.source, "location", rtspLink, nullptr);
+    //g_object_set(m_videoDataRTSP.source, "latency", 5000, nullptr);
+
 
 
     //Set the textoverlay
@@ -434,78 +419,6 @@ void HandlerGStreamer::startPipelineRTSP()
     qDebug() << "Finish Free resources";
 }
 
-void HandlerGStreamer::startPipelineVideo()
-{
-    qDebug() << "void HandlerGStreamer::startPipelineVideo()";
-    createGstElementsVideo();
-
-    if (!m_videoDataVideo.isValid()) {
-        qDebug() << "Not all elements could be created.";
-        return;
-    }
-
-    //does not use
-    //m_streamContext->setVideoData(m_videoData);
-
-    //Qt window integration
-    if (GST_IS_VIDEO_OVERLAY(m_videoDataVideo.sink))
-    {
-        gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(m_videoDataVideo.sink), m_wid);
-    }
-    else
-    {
-        qDebug() << "This sink is not support GstVideoOverlay";
-    }
-
-    /* Build the pipeline. Note that we are NOT linking the source at this
-    point. We will do it later. */
-    gst_bin_add_many (GST_BIN (m_videoDataVideo.pipeline), m_videoDataVideo.source, m_videoDataVideo.queue,
-                     m_videoDataVideo.convert, m_videoDataVideo.sink, nullptr);
-
-    if (!gst_element_link_many (m_videoDataVideo.queue, m_videoDataVideo.convert, m_videoDataVideo.sink, nullptr)) {
-        qDebug() << "Elements video could not be linked.";
-        gst_object_unref (m_videoDataVideo.pipeline);
-        return;
-    }
-
-    // Set the URI to play
-    QByteArray baRtspLink = m_rtspLink.toUtf8();
-    const char* pathVideo = baRtspLink.constData();
-    g_object_set(m_videoDataVideo.source, "uri", pathVideo, nullptr);
-
-
-    //Set aspect ratio
-    g_object_set(m_videoDataVideo.sink, "force-aspect-ratio", false, nullptr);
-
-    /* Connect to the pad-added signal */
-    g_signal_connect (m_videoDataVideo.source, "pad-added", G_CALLBACK (pad_added_videosrc), &m_videoDataVideo);
-
-    /* Start playing */
-    GstStateChangeReturn ret;
-    ret = gst_element_set_state (m_videoDataVideo.pipeline, GST_STATE_PLAYING);
-    if (ret == GST_STATE_CHANGE_FAILURE) {
-        qDebug() << "Unable to set the pipeline to the playing state";
-        gst_object_unref (m_videoDataVideo.pipeline);
-        return;
-    }
-    // Listen to the bus
-    GstBus *bus;
-    bus = gst_element_get_bus (m_videoDataVideo.pipeline);
-    m_bus_watch_id = gst_bus_add_watch(bus, bus_callback, this);
-    gst_object_unref(bus);
-    loop = g_main_loop_new(nullptr, false);
-    g_main_loop_run(loop);
-    qDebug() << "Start Free resources";
-    // Free resources
-    gst_element_set_state (m_videoDataRTSP.pipeline, GST_STATE_NULL);
-    gst_object_unref(m_videoDataRTSP.pipeline);
-    g_source_remove (m_bus_watch_id);
-    g_main_loop_unref (loop);
-    m_videoDataRTSP.clear();
-    qDebug() << "Finish Free resources";
-}
-
-
 void HandlerGStreamer::createGstElementsRTSP()
 {
     m_videoDataRTSP.pipeline = gst_pipeline_new ("rtsp-pipeline");
@@ -523,19 +436,6 @@ void HandlerGStreamer::createGstElementsRTSP()
     m_videoDataRTSP.audio_sink = gst_element_factory_make("autoaudiosink", "audio_sink");
 }
 
-void HandlerGStreamer::createGstElementsVideo()
-{
-    m_videoDataVideo.pipeline = gst_pipeline_new ("video-pipeline");
-    m_videoDataVideo.source = gst_element_factory_make ("uridecodebin", "source");
-    m_videoDataVideo.queue = gst_element_factory_make ("queue", "queue");
-    m_videoDataVideo.convert = gst_element_factory_make ("videoconvert", "convert");
-    m_videoDataVideo.sink = gst_element_factory_make ("d3dvideosink", "video_sink");
-    m_videoDataVideo.audio_queue = gst_element_factory_make ("queue", "audio_queue");
-    m_videoDataVideo.audio_convert = gst_element_factory_make("audioconvert", "audio_convert");
-    m_videoDataVideo.audio_resample = gst_element_factory_make("audioresample", "audio_resample");
-    m_videoDataVideo.audio_volume = gst_element_factory_make("volume", "volume");
-    m_videoDataVideo.audio_sink = gst_element_factory_make("autoaudiosink", "audio_sink");
-}
 
 
 

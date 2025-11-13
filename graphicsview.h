@@ -6,6 +6,7 @@
 #include <QMimeData>
 #include <QDropEvent>
 #include "streamcontext.h"
+#include "constants.h"
 #include <gst/gst.h>
 #include <gst/video/video.h>
 #include <glib.h>
@@ -27,13 +28,17 @@ private:
         QString m_rtspLink;
         QString m_textOverlay;
         QString m_pathCover;
+        QString m_pathVideo;
         void clearDropInfo();
-        void updateRenderRect();
+        //void updateRenderRect();
+        Roles::Roles m_role;
 signals:
     void rtspLinkDropped(const QString& rtspLink);
+    void videoPathDropped(const QString& videoPath);
     void coverPathDropped(const QString& coverPath);
     void textOverlayDropped(const QString& rtspLink);
     void startRtspStream();
+    void startVideoStream();
     void clearScreen();
 };
 
