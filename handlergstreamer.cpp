@@ -1,6 +1,8 @@
 #include "handlergstreamer.h"
 #include "bus_callbackRTSP.h"
 #include <QByteArray>
+#include <spdlog/async.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 HandlerGStreamer::HandlerGStreamer(StreamContext* streamContext, QObject *parent)
     : QThread{parent}, m_streamContext{streamContext}
@@ -8,7 +10,6 @@ HandlerGStreamer::HandlerGStreamer(StreamContext* streamContext, QObject *parent
     // Initialize GStreamer
     gst_init(nullptr, nullptr);
     m_videoDataRTSP.clear();
-
 }
 
 HandlerGStreamer::HandlerGStreamer(QObject *parent)
@@ -23,7 +24,9 @@ void HandlerGStreamer::stopLoop()
 {
     if(loop)
     {
+        qDebug() << "void HandlerGStreamer::stopLoop()";
         g_main_loop_quit(loop);
+
     }
 }
 
@@ -34,6 +37,8 @@ const VideoDataRTSP &HandlerGStreamer::getDataRTSP()
 
 HandlerGStreamer::~HandlerGStreamer()
 {
+    //m_logger->flush();
+    //spdlog::shutdown();
 }
 
 void HandlerGStreamer::setRtsp(const QString &rtspLink)
@@ -75,10 +80,31 @@ void HandlerGStreamer::pauseVideo()
 
 void HandlerGStreamer::stopVideo()
 {
+    qDebug() << "void HandlerGStreamer::stopVideo()";
     m_stopped = true;
     stopLoop();
     wait();
-    emit videoStopped();
+    m_stopped = false;
+    m_connected = false;
+}
+
+void HandlerGStreamer::setStopped()
+{
+    m_stopped = true;
+}
+
+void HandlerGStreamer::setVideoOutputWindow(const WId wid)
+{
+    qDebug() << "void HandlerGStreamer::setVideoOutputWindow(const WId wid)";
+    //Qt window integration
+    if (GST_IS_VIDEO_OVERLAY(m_videoDataRTSP.sink))
+    {
+        gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(m_videoDataRTSP.sink), wid);
+    }
+    else
+    {
+        qDebug() << "This sink is not support GstVideoOverlay";
+    }
 }
 
 void HandlerGStreamer::emitStartRtspStream()
@@ -95,31 +121,22 @@ void HandlerGStreamer::emitSendLoadInfo(const QString &str)
 
 void HandlerGStreamer::run()
 {
-    startPipelineRTSP();
-    if(m_stopped)
-    {
-        return;
-    }
-    if(!m_connected)
-    {
-       int retryCount = 1;
-        while(retryCount < 1 && !m_connected)
+    qDebug() << "Start void HandlerGStreamer::run()";
+    qDebug() << "m_stopped" << m_stopped;
+    int retryCount = 0;
+    while (!m_stopped)
         {
-            qDebug() << "Trying to reconnect RTSP stream";
+        if (retryCount > 1 && !m_connected)
+        {
+            emit errorConnectRtspStream();
+            break;
+        }
             startPipelineRTSP();
             retryCount += 1;
+        }
 
-        }
-    }
-    if (m_connected)
-    {
-        while(true)
-        {
-            startPipelineRTSP();
-            qDebug() << "Restar RTSP stream";
-        }
-    }
-    emit errorConnectRtspStream();
+    //startPipelineRTSP();
+    qDebug() << "Finish void HandlerGStreamer::run()";
 }
 
 void HandlerGStreamer::pad_added_rtspsrc(GstElement *src, GstPad *new_pad, VideoDataRTSP *videoData)
@@ -333,6 +350,10 @@ void HandlerGStreamer::pad_added_audio_decoder(GstElement *src, GstPad *new_pad,
 void HandlerGStreamer::startPipelineRTSP()
 {
     qDebug() << "void HandlerGStreamer::startPipelineRTSP()";
+    qDebug() << "Stream:" << m_overlayText << " start";
+    //QString pathLog = "logs/" + m_overlayText + ".txt";
+    //m_logger = spdlog::basic_logger_mt<spdlog::async_factory>(m_overlayText.toStdString(), pathLog.toStdString());
+    //m_logger->info("Stream {} start", m_overlayText.toStdString());
     createGstElementsRTSP();
 
     if (!m_videoDataRTSP.isValid()) {
@@ -353,8 +374,7 @@ void HandlerGStreamer::startPipelineRTSP()
         qDebug() << "This sink is not support GstVideoOverlay";
     }
 
-    /* Build the pipeline. Note that we are NOT linking the source at this
-    point. We will do it later. */
+    /* Build the pipeline. */
     gst_bin_add_many (GST_BIN (m_videoDataRTSP.pipeline), m_videoDataRTSP.source, m_videoDataRTSP.queue, m_videoDataRTSP.decoder,
                      m_videoDataRTSP.convert, m_videoDataRTSP.textoverlay, m_videoDataRTSP.sink, nullptr);
 
@@ -376,8 +396,6 @@ void HandlerGStreamer::startPipelineRTSP()
     QByteArray baRtspLink = m_rtspLink.toUtf8();
     const char* rtspLink = baRtspLink.constData();
     g_object_set(m_videoDataRTSP.source, "location", rtspLink, nullptr);
-    //g_object_set(m_videoDataRTSP.source, "latency", 5000, nullptr);
-
 
 
     //Set the textoverlay
@@ -415,7 +433,10 @@ void HandlerGStreamer::startPipelineRTSP()
     gst_object_unref(m_videoDataRTSP.pipeline);
     g_source_remove (m_bus_watch_id);
     g_main_loop_unref (loop);
+    loop = nullptr;
     m_videoDataRTSP.clear();
+    //m_logger->info("Stream {} finish", m_overlayText.toStdString());
+    emit videoStopped();
     qDebug() << "Finish Free resources";
 }
 

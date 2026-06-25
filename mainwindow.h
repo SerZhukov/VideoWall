@@ -20,6 +20,8 @@ public slots:
     void enableFullScreen();
     void disableFullScreen();
     bool isInFullScreenMode();
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
 private:
     WorkSreens* m_workSreens = nullptr;
     ScreenPartitionButtons* m_scrPartitionBtn = nullptr;

@@ -1,3 +1,4 @@
+
 #ifndef GRAPHICSVIEW_H
 #define GRAPHICSVIEW_H
 
@@ -18,11 +19,15 @@ public:
     GraphicsView(StreamContext* streamContext, QGraphicsScene *scene, QWidget *parent = nullptr);
     GraphicsView(QWidget *parent = nullptr);
     ~GraphicsView();
+public slots:
+    void setIsFullScreen(bool isFullScreen);
 protected:
     virtual void dragEnterEvent(QDragEnterEvent* event) override;
     virtual void dropEvent(QDropEvent* event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void mouseDoubleClickEvent (QMouseEvent *event) override;
+    //virtual void contextMenuEvent(QContextMenuEvent *event) override;
 private:
         StreamContext* m_streamContex;
         QString m_rtspLink;
@@ -30,8 +35,10 @@ private:
         QString m_pathCover;
         QString m_pathVideo;
         void clearDropInfo();
-        //void updateRenderRect();
         Roles::Roles m_role;
+        bool m_isFullScreen = false;
+        QWidget* m_parent = nullptr;
+        QLayout*  m_layout = nullptr;
 signals:
     void rtspLinkDropped(const QString& rtspLink);
     void videoPathDropped(const QString& videoPath);
@@ -40,6 +47,8 @@ signals:
     void startRtspStream();
     void startVideoStream();
     void clearScreen();
+    void fullScreenRequested(bool);
+    void snapshotRequested();
 };
 
 #endif // GRAPHICSVIEW_H

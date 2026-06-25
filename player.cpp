@@ -1,4 +1,5 @@
 #include "player.h"
+#include <QApplication>
 
 
 Player::Player(QWidget *parent)
@@ -44,15 +45,22 @@ Player::Player(QWidget *parent)
     //Set VideoScreen after LoadScreen
     connect(m_handlerGSt, &HandlerGStreamer::startRtspStream, m_screen, &VideoPlayer::setVideoScreen);
     connect(m_handlerVideo, &HandlerVideoGStreamer::startVideo, m_screen, &VideoPlayer::setVideoScreen);
-
+    //Set ErrorScreen if reconnect is failed
     connect(m_handlerGSt, &HandlerGStreamer::errorConnectRtspStream, m_screen, &VideoPlayer::setErrorScreen);
+    //Set flag stop if close app
+    connect(qApp, &QApplication::aboutToQuit, m_handlerGSt, &HandlerGStreamer::setStopped);
+    //Set fullscreen
+    connect(m_screen, &VideoPlayer::fullScreenRequested, m_handlerGSt, &HandlerGStreamer::setVideoOutputWindow);
 }
 
 Player::~Player()
 {
+    qDebug() << "Player::~Player()";
     if(m_handlerGSt->isRunning())
     {
+        qDebug() << "m_handlerGSt->isRunning()";
         m_handlerGSt->stopVideo();
+        m_handlerGSt->wait();
         delete m_handlerGSt;
     }
     else
@@ -82,8 +90,10 @@ void Player::playVideo()
 
 void Player::playRTSP()
 {
+    qDebug() << "void Player::playRTSP()";
     if(m_handlerGSt->isRunning())
     {
+        qDebug() << "m_handlerGSt->isRunning()";
         m_handlerGSt->stopVideo();
         m_handlerGSt->start();
     }
@@ -97,6 +107,8 @@ void Player::playRTSP()
         m_handlerGSt->start();
     }
 }
+
+
 
 
 

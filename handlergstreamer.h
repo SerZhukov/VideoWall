@@ -11,7 +11,7 @@
 #include "ibuscallback.h"
 #include "igstreamerdataprovider.h"
 #include "streamcontext.h"
-
+#include <spdlog/spdlog.h>
 
 class HandlerGStreamer : public QThread, public IGStreamerDataProvider, public IBusCallback
 {
@@ -33,6 +33,8 @@ public slots:
     void playVideo();
     void pauseVideo();
     void stopVideo();
+    void setStopped();
+    void setVideoOutputWindow(const WId wid);
 protected:
     void run() override;
 private:
@@ -48,12 +50,14 @@ private:
     static void pad_added_rtspsrc(GstElement* src, GstPad* new_pad, VideoDataRTSP* data);
     static void pad_added_video_decoder(GstElement* src, GstPad* new_pad, VideoDataRTSP* data);
     static void pad_added_audio_decoder(GstElement* src, GstPad* new_pad, VideoDataRTSP* data);
+
     //Start main pipeline
     void startPipelineRTSP();
     //create Gst elements
     void createGstElementsRTSP();
     bool m_connected = false;
     bool m_stopped = false;
+    std::shared_ptr<spdlog::logger> m_logger;
 signals:
     void videoStopped();
     void startRtspStream();

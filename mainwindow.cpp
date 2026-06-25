@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QPalette>
+#include <QKeyEvent>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}, m_workSreens(new WorkSreens(this)), m_scrPartitionBtn(new ScreenPartitionButtons(this))
@@ -35,7 +36,7 @@ void MainWindow::openScreenAddSettings()
 void MainWindow::enableFullScreen()
 {
     m_ptb->hide();
-    this->setWindowFlags(Qt::FramelessWindowHint);
+    //this->setWindowFlags(Qt::FramelessWindowHint);
     this->showFullScreen();
     this->show();
     m_fullScreen = true;
@@ -44,7 +45,7 @@ void MainWindow::enableFullScreen()
 void MainWindow::disableFullScreen()
 {
     m_ptb->show();
-    this->setWindowFlags(Qt::Window);
+    //this->setWindowFlags(Qt::Window);
     this->showNormal();
     this->show();
     m_fullScreen = false;
@@ -53,6 +54,23 @@ void MainWindow::disableFullScreen()
 bool MainWindow::isInFullScreenMode()
 {
     return m_fullScreen;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    // qDebug() << "void MainWindow::keyPressEvent(QKeyEvent *event)";
+    // if(event->key() == Qt::Key_Escape)
+    // {
+    //     if(m_fullScreen)
+    //     {
+    //         this->disableFullScreen();
+    //     }
+    // }
+    // else
+    // {
+    //     QWidget::keyPressEvent(event);
+    // }
+    QWidget::keyPressEvent(event);
 }
 
 QToolBar *MainWindow::createToolBar()

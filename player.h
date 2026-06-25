@@ -17,6 +17,7 @@ public:
 public slots:
     void playVideo();
     void playRTSP();
+
 private:
     HandlerGStreamer* m_handlerGSt;
     HandlerVideoGStreamer* m_handlerVideo;

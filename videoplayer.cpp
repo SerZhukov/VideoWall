@@ -1,4 +1,6 @@
 #include "videoplayer.h"
+#include "globalvariables.h"
+#include <QMenu>
 
 VideoPlayer::VideoPlayer(StreamContext* streamContext, QWidget *parent)
     : QWidget{parent}, m_streamContex{streamContext}
@@ -25,10 +27,12 @@ VideoPlayer::VideoPlayer(StreamContext* streamContext, QWidget *parent)
     m_scene->addItem(m_background);
     m_view->fitInView(m_background, Qt::IgnoreAspectRatio);
     m_view->centerOn(m_background);
+    m_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     m_hintText = m_scene->addText("Drag a camera here to start monitoring.", QFont("Arial", 45));
     QRectF sceneRect = m_scene->sceneRect();
     QRectF textRect = m_hintText->boundingRect();
     m_hintText->setPos(sceneRect.center() - textRect.center());
+    m_fullScreen = new GraphicsView(m_streamContex, m_scene);
     //received the signal about dropping the RTSP link in GraphicsView
     connect(m_view, &GraphicsView::rtspLinkDropped, this, &VideoPlayer::emitRtspLink);
     //received the signal about dropping the video link in GraphicsView
@@ -53,6 +57,13 @@ VideoPlayer::VideoPlayer(StreamContext* streamContext, QWidget *parent)
     connect(m_errorWidget, &ErrorWidget::closeErrorScreen, this, &VideoPlayer::setVideoScreen);
     //received the signal about reconnect
     connect(m_errorWidget, &ErrorWidget::reconnect, this, &VideoPlayer::emitStartRtspStream);
+    //recived the signal about full screen mode
+    connect(m_view, &GraphicsView::fullScreenRequested, this, &VideoPlayer::setFullScreen);
+    connect(m_view, &GraphicsView::fullScreenRequested, m_fullScreen, &GraphicsView::setIsFullScreen);
+    connect(m_fullScreen, &GraphicsView::fullScreenRequested, m_view, &GraphicsView::setIsFullScreen);
+    connect(m_fullScreen, &GraphicsView::fullScreenRequested, this, &VideoPlayer::setFullScreen);
+
+
 
 }
 
@@ -176,6 +187,56 @@ void VideoPlayer::setVideoScreen()
 void VideoPlayer::setErrorScreen()
 {
     m_stackedLayout->setCurrentIndex(ERROR_SCREEN);
+}
+
+
+void VideoPlayer::setFullScreen(bool enabled)
+{
+    if(enabled)
+    {
+        mainWindow->hide();
+        emit fullScreenRequested(m_fullScreen->winId());
+        m_fullScreen->showFullScreen();
+        m_isFullScreen = true;
+    }
+    else
+    {
+        bool mainWindowState = mainWindow->isInFullScreenMode();
+        if(m_isFullScreen)
+        {
+            emit fullScreenRequested(m_view->winId());
+            mainWindow->show();
+            m_fullScreen->hide();
+            m_isFullScreen = false;
+        }
+        else if(mainWindow->isInFullScreenMode())
+        {
+            mainWindow->disableFullScreen();
+        }
+    }
+}
+
+// void VideoPlayer::contextMenuEvent(QContextMenuEvent *event)
+// {
+//     QMenu contextMenu(this);
+//     QAction* snapshot = contextMenu.addAction("snapshot");
+//     QAction* result = contextMenu.exec(event->globalPos());
+//     if(result == snapshot)
+//     {
+//         emit snapshotRequested();
+//     }
+// }
+
+void VideoPlayer::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu* contextMenu = new QMenu(this);
+    QAction* snapshot = contextMenu->addAction("snapshot");
+    connect(snapshot, &QAction::triggered, this, [this] ()
+            {
+        emit snapshotRequested();
+        qDebug() << "emit snapshotRequested();";
+    });
+    contextMenu->popup(event->globalPos());
 }
 
 void VideoPlayer::setLoadScreen()

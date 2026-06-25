@@ -19,7 +19,7 @@ bool EscKeyFilter::eventFilter(QObject *obj, QEvent *event)
             if(m_mainWindow->isInFullScreenMode())
             {
                 m_mainWindow->disableFullScreen();
-                return true;
+                return false;
             }
             else
             {

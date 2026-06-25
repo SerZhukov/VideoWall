@@ -24,8 +24,6 @@ CameraListWidget::CameraListWidget(QWidget *parent)
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     //delete object from camera list
     m_view->addAction("Delete", this, [this]() {
-        //clearCameraList();
-        //m_settingsManager->clearData();
         deleteItem();
     });
     m_view->setContextMenuPolicy(Qt::ActionsContextMenu);

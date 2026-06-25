@@ -81,13 +81,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         mediasource.h
         handlervideogstreamer.h
         handlervideogstreamer.cpp
-
-
         errorwidget.h errorwidget.cpp
-
-
-
-
+        globalvariables.h
+        fullscreenwindow.h fullscreenwindow.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -107,6 +103,11 @@ else()
         )
     endif()
 endif()
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 target_link_libraries(VideoWall PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
     gstreamer-1.0.lib

@@ -1,5 +1,8 @@
 #include "graphicsview.h"
 #include "constants.h"
+#include <QGuiApplication>
+#include <QStackedLayout>
+#include <QMenu>
 
 GraphicsView::GraphicsView(StreamContext* streamContext, QGraphicsScene *scene, QWidget *parent)
     : QGraphicsView{scene, parent}, m_streamContex{streamContext}
@@ -7,17 +10,25 @@ GraphicsView::GraphicsView(StreamContext* streamContext, QGraphicsScene *scene, 
 
     setAcceptDrops(true);
     setDragMode(QGraphicsView::NoDrag);
+
+
 }
 
 GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView{parent}
 {
     setAcceptDrops(true);
     setDragMode(QGraphicsView::NoDrag);
+
 }
 
 GraphicsView::~GraphicsView()
 {
 
+}
+
+void GraphicsView::setIsFullScreen(bool isFullScreen)
+{
+    m_isFullScreen = isFullScreen;
 }
 
 void GraphicsView::dragEnterEvent(QDragEnterEvent *event)
@@ -39,7 +50,7 @@ void GraphicsView::dropEvent(QDropEvent *event)
     const QMimeData* mimeData = event->mimeData();
     QByteArray encoded = mimeData->data("application/x-qabstractitemmodeldatalist");
     QDataStream stream(&encoded, QIODevice::ReadOnly);
-    stream.setVersion(QDataStream::Qt_6_5);
+    stream.setVersion(QDataStream::Qt_6_9);
     while (!stream.atEnd()) {
         int row, col;
         QMap<int,  QVariant> roleDataMap;
@@ -84,14 +95,12 @@ void GraphicsView::dropEvent(QDropEvent *event)
     {
         emit videoPathDropped(m_pathVideo);
         emit startVideoStream();
-
     }
 }
 
 void GraphicsView::resizeEvent(QResizeEvent *event)
 {
     fitInView(scene()->sceneRect(), Qt::IgnoreAspectRatio);
-    //updateRenderRect();
     QGraphicsView::resizeEvent(event);
 }
 
@@ -101,11 +110,54 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     {
         emit clearScreen();
     }
+     if(event->key() == Qt::Key_Escape)
+    {
+         if(m_isFullScreen)
+         {
+             emit fullScreenRequested(false);
+             m_isFullScreen = false;
+         }
+         else
+         {
+             emit fullScreenRequested(false);
+         }
+    }
      else
      {
          QWidget::keyPressEvent(event);
     }
 }
+
+void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    qDebug() << "void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)";
+    if(event->button() == Qt::LeftButton)
+    {
+        if(!m_isFullScreen)
+        {
+            emit fullScreenRequested(true);
+            m_isFullScreen = true;
+        }
+        else
+        {
+            emit fullScreenRequested(false);
+            m_isFullScreen = false;
+        }
+    }
+    QGraphicsView::mouseDoubleClickEvent(event);
+}
+
+// void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
+// {
+//     QMenu* contextMenu = new QMenu(this);
+//     QAction* snapshot = contextMenu->addAction("snapshot");
+//     connect(snapshot, &QAction::triggered, this, [this] ()
+//             {
+//                 emit snapshotRequested();
+//                 qDebug() << "emit snapshotRequested();";
+//             });
+//     contextMenu->popup(event->globalPos());
+// }
 
 void GraphicsView::clearDropInfo()
 {
@@ -114,21 +166,7 @@ void GraphicsView::clearDropInfo()
     m_pathCover.clear();
 }
 
-// void GraphicsView::updateRenderRect()
-// {
-//     GstElement *sink = m_streamContex->getVideoData().sink;
-//     if(!sink)
-//     {
-//         qDebug() << "Sink is not valid";
-//         return;
-//     }
-//     int w = this->width();
-//     qDebug() << "w = " << w;
-//     int h = this->height();
-//     qDebug() << "h = " << h;
-//     gst_video_overlay_set_render_rectangle(GST_VIDEO_OVERLAY(sink), 0, 0, w, h);
-//     gst_video_overlay_expose(GST_VIDEO_OVERLAY(sink));
-// }
+
 
 
 

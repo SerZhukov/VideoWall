@@ -18,7 +18,7 @@ WorkSreens::WorkSreens(QWidget *parent)
     m_cameraListWidget = new CameraListWidget;
     m_mainLayout->addWidget(m_cameraListWidget);
     setLayout(m_mainLayout);
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+   //setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     setContentsMargins(0, 0, 0, 0);
 }
 
@@ -32,6 +32,8 @@ void WorkSreens::generateScr(int countScr)
     for (int row = 0; row < count; ++row) {
         for (int column = 0; column < count; ++column) {
             Player* scr = new Player(this);
+            //scr->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+            //scr->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             m_grdLayout->addWidget(scr, row, column);
         }
     }

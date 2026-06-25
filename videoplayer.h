@@ -3,6 +3,7 @@
 #define VIDEOPLAYER_H
 
 #include <QWidget>
+#include <QLabel>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QVBoxLayout>
@@ -11,6 +12,7 @@
 #include "loadingwidget.h"
 #include "streamcontext.h"
 #include "errorwidget.h"
+#include <QSizePolicy>
 
 
 class VideoPlayer : public QWidget
@@ -37,6 +39,9 @@ public slots:
     WId getWId();
     void setVideoScreen();
     void setErrorScreen();
+    void setFullScreen(bool enabled);
+protected:
+    void contextMenuEvent(QContextMenuEvent *event) override;
 private:
     StreamContext* m_streamContex = nullptr;
     QGraphicsPixmapItem* m_background = nullptr;
@@ -48,9 +53,12 @@ private:
     ErrorWidget* m_errorWidget = nullptr;
     QVBoxLayout* m_layout = nullptr;
     QStackedLayout* m_stackedLayout = nullptr;
+    QSize m_sizeBeforeFullscreen;
+    GraphicsView* m_fullScreen;
     bool m_setCover = false;
     bool m_setRtspStream = false;
     bool m_setVideoStream = false;
+    bool m_isFullScreen = false;
     void deleteCover();
     void setLoadScreen();
 signals:
@@ -60,6 +68,8 @@ signals:
     void startRtspStream();
     void startVideoStream();
     void clearScreen();
+    void fullScreenRequested(const WId);
+    void snapshotRequested();
 };
 
 #endif // VIDEOPLAYER_H
